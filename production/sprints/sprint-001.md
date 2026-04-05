@@ -24,12 +24,11 @@ el combate terrestre para validar la hipótesis central del juego.
 | S1-04 | Implementar Unit Data Model (CharacterData SO, StatBlock) | gameplay-programmer | ScriptableObject creable, stats legibles, 15 unit tests passing |
 | S1-05 | Implementar Damage & Stats Engine (fórmula master + buffs) | gameplay-programmer | Fórmulas del DSE GDD implementadas, 20+ unit tests passing |
 | S1-06 | Implementar Initiative Bar (orden de turnos por SPD) | gameplay-programmer | Turnos correctos según SPD, 25 unit tests passing |
+| S1-07 | Prototipar Combate Terrestre (core loop jugable) | prototyper | 3v2 jugable, ataque+habilidad+guardia, victoria/derrota validado en Unity |
 
 ### In Progress
 
-| ID | Task | Owner | Dependencies | Acceptance Criteria |
-|----|------|-------|-------------|---------------------|
-| S1-07 | Prototipar Combate Terrestre (core loop jugable) | prototyper | S1-05, S1-06 | 3 unidades vs 2 enemigos, ataque+habilidad+guardia, victoria/derrota funcional |
+_(empty)_
 
 ### Ready (next up)
 
@@ -39,7 +38,6 @@ _(empty)_
 
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
-| S1-07 | Prototipar Combate Terrestre (core loop jugable) | prototyper | S1-05, S1-06 | 3 unidades vs 2 enemigos, ataque+habilidad+guardia, victoria/derrota funcional |
 
 ### Backlog — Should Have
 
@@ -70,9 +68,9 @@ _(empty)_
 
 - [x] Proyecto Unity compila y corre
 - [x] 2+ ADRs en `docs/architecture/`
-- [ ] Prototipo de combate terrestre jugable (placeholder art)
-- [ ] Core loop validado: seleccionar acción → resolver turno → victoria/derrota
-- [ ] 5+ unit tests para Damage & Stats Engine
+- [x] Prototipo de combate terrestre jugable (placeholder art)
+- [x] Core loop validado: seleccionar acción → resolver turno → victoria/derrota
+- [x] 5+ unit tests para Damage & Stats Engine
 - [ ] No S1/S2 bugs en features entregadas
 - [ ] Design documents actualizados si hay desviaciones
 
