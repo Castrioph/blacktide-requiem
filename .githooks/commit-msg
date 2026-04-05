@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+#
+# commit-msg hook — validates Conventional Commits format
+# Spec: https://www.conventionalcommits.org/en/v1.0.0/
+#
+# Format: <type>(<scope>): <description>
+#         <type>: <description>
+#         <type>!: <description>
+#         <type>(<scope>)!: <description>
+
+commit_msg_file="$1"
+commit_msg=$(head -1 "$commit_msg_file")
+
+# Allowed types
+types="feat|fix|docs|style|refactor|perf|test|build|ci|chore|design"
+
+# Regex: type(optional-scope)optional-!: description
+pattern="^($types)(\([a-z0-9-]+\))?\!?: .{1,}"
+
+if ! echo "$commit_msg" | grep -Eq "$pattern"; then
+    echo ""
+    echo "ERROR: Commit message does not follow Conventional Commits."
+    echo ""
+    echo "Expected format:"
+    echo "  <type>(<scope>): <description>"
+    echo ""
+    echo "Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, design"
+    echo ""
+    echo "Examples:"
+    echo "  feat(combat): add initiative bar turn ordering"
+    echo "  fix(economy): correct first-clear reward calculation"
+    echo "  docs(design): add equipment system GDD"
+    echo "  build(engine): configure URP 2D renderer"
+    echo ""
+    echo "Your message was:"
+    echo "  $commit_msg"
+    echo ""
+    exit 1
+fi
+
+# Check max length (72 chars)
+if [ ${#commit_msg} -gt 72 ]; then
+    echo ""
+    echo "ERROR: Commit message first line is ${#commit_msg} chars (max 72)."
+    echo ""
+    echo "Your message was:"
+    echo "  $commit_msg"
+    echo ""
+    exit 1
+fi
+
+# Check description starts with lowercase
+description=$(echo "$commit_msg" | sed -E "s/^($types)(\([a-z0-9-]+\))?\!?: //")
+first_char=$(echo "$description" | cut -c1)
+if echo "$first_char" | grep -Eq "^[A-Z]$"; then
+    echo ""
+    echo "ERROR: Description must start with lowercase."
+    echo ""
+    echo "Your message was:"
+    echo "  $commit_msg"
+    echo ""
+    exit 1
+fi
+
+# Check no trailing period
+if echo "$commit_msg" | grep -Eq "\.$"; then
+    echo ""
+    echo "ERROR: Description must not end with a period."
+    echo ""
+    echo "Your message was:"
+    echo "  $commit_msg"
+    echo ""
+    exit 1
+fi
