@@ -22,6 +22,8 @@ el combate terrestre para validar la hipótesis central del juego.
 | S1-02 | ADR: State Management (ScriptableObjects + Event Bus, no singletons) | technical-director | ADR en `docs/architecture/` con decisión y rationale |
 | S1-03 | ADR: Rendering Pipeline (URP 2D setup) | technical-director | ADR + URP configurado en proyecto |
 | S1-04 | Implementar Unit Data Model (CharacterData SO, StatBlock) | gameplay-programmer | ScriptableObject creable, stats legibles, 15 unit tests passing |
+| S1-05 | Implementar Damage & Stats Engine (fórmula master + buffs) | gameplay-programmer | Fórmulas del DSE GDD implementadas, 20+ unit tests passing |
+| S1-06 | Implementar Initiative Bar (orden de turnos por SPD) | gameplay-programmer | Turnos correctos según SPD, 25 unit tests passing |
 
 ### In Progress
 
@@ -31,13 +33,12 @@ _(empty)_
 
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
-| S1-05 | Implementar Damage & Stats Engine (fórmula master + buffs) | gameplay-programmer | S1-04 | Fórmulas del DSE GDD implementadas, 5+ unit tests |
+| S1-07 | Prototipar Combate Terrestre (core loop jugable) | prototyper | S1-05, S1-06 | 3 unidades vs 2 enemigos, ataque+habilidad+guardia, victoria/derrota funcional |
 
 ### Backlog — Critical Path
 
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
-| S1-06 | Implementar Initiative Bar (orden de turnos por SPD) | gameplay-programmer | S1-04 | Turnos correctos según SPD, test con 6 entidades |
 | S1-07 | Prototipar Combate Terrestre (core loop jugable) | prototyper | S1-05, S1-06 | 3 unidades vs 2 enemigos, ataque+habilidad+guardia, victoria/derrota funcional |
 
 ### Backlog — Should Have
