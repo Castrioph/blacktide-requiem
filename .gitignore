@@ -1,3 +1,9 @@
+# === Binary / Large Files ===
+*.pptx
+*.ppt
+*.docx
+*.xlsx
+
 # === IDE and Editor ===
 .vs/
 .vscode/settings.json
