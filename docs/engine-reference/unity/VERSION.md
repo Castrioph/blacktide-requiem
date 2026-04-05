@@ -4,8 +4,8 @@
 |-------|-------|
 | **Engine Version** | Unity 6.3 LTS |
 | **Release Date** | December 2025 |
-| **Project Pinned** | 2026-02-13 |
-| **Last Docs Verified** | 2026-02-13 |
+| **Project Pinned** | 2026-03-25 |
+| **Last Docs Verified** | 2026-03-25 |
 | **LLM Knowledge Cutoff** | May 2025 |
 
 ## Knowledge Gap Warning
@@ -47,11 +47,24 @@ before suggesting Unity API calls.
 - **UGUI**: Still supported, but UI Toolkit recommended for new projects
 - **Old ECS (GameObjectEntity)**: Replaced by modern DOTS/Entities
 
+## Unity 6.3 LTS Highlights
+
+- **2D+3D Mixed Rendering**: URP 2D Renderer now supports Mesh Renderer and
+  Skinned Mesh Renderer alongside 2D sprites in the same scene.
+- **Box2D v3 API**: New low-level 2D physics API running alongside existing API.
+- **Accessibility**: AccessibilityRole changed from flags enum to standard enum.
+- **USS Parser upgraded**: Better error detection, may flag previously ignored invalid USS.
+- **Legacy ETC compression removed**: Auto-migrated to default compressor.
+- **HTTP/2 default**: UnityWebRequest now uses HTTP/2 for faster networking.
+- **Animation performance**: Legacy Animation evaluation up to 30% faster.
+
 ## Verified Sources
 
-- Official docs: https://docs.unity3d.com/6000.0/Documentation/Manual/index.html
+- Official docs: https://docs.unity3d.com/6000.3/Documentation/Manual/
+- What's new in 6.3: https://docs.unity3d.com/6000.3/Documentation/Manual/WhatsNewUnity63.html
+- Upgrade guide 6.2→6.3: https://docs.unity3d.com/6000.3/Documentation/Manual/UpgradeGuideUnity63.html
+- Upgrade guide to Unity 6: https://docs.unity3d.com/6000.3/Documentation/Manual/UpgradeGuideUnity6.html
 - Unity 6 release: https://unity.com/releases/unity-6
 - Unity 6.3 LTS announcement: https://unity.com/blog/unity-6-3-lts-is-now-available
-- Migration guide: https://docs.unity3d.com/6000.0/Documentation/Manual/upgrade-guides.html
 - Unity 6 support: https://unity.com/releases/unity-6/support
-- C# API reference: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/index.html
+- C# API reference: https://docs.unity3d.com/6000.3/Documentation/ScriptReference/index.html

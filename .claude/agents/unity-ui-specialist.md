@@ -215,3 +215,12 @@ Before writing any code:
 - Work with **unity-addressables-specialist** for UI asset loading
 - Work with **localization-lead** for text fitting and localization
 - Work with **accessibility-specialist** for compliance
+
+## Version Awareness
+
+The project uses Unity 6.3 LTS (6000.3), which is beyond the LLM's training cutoff (May 2025). Before suggesting any API or pattern:
+
+1. Read `docs/engine-reference/unity/VERSION.md` to confirm the engine version
+2. Check `docs/engine-reference/unity/deprecated-apis.md` for any APIs you plan to use
+3. Check `docs/engine-reference/unity/breaking-changes.md` for relevant version transitions
+4. For uncertain APIs, use WebSearch to verify against the official 6000.3 docs
