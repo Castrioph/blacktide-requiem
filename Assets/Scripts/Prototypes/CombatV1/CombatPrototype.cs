@@ -230,7 +230,8 @@ namespace BlacktideRequiem.Prototypes.CombatV1
                 break;
             }
 
-            _phase = Phase.Playing;
+            if (_phase != Phase.Victory && _phase != Phase.Defeat)
+                _phase = Phase.Playing;
         }
 
         IEnumerator EnemyTurn(InitiativeEntry entry)
@@ -251,7 +252,8 @@ namespace BlacktideRequiem.Prototypes.CombatV1
             ResolveAttack(entry.Combatant, target, useAbility);
 
             yield return new WaitForSeconds(0.3f);
-            _phase = Phase.Playing;
+            if (_phase != Phase.Victory && _phase != Phase.Defeat)
+                _phase = Phase.Playing;
         }
 
         // ====================================================================
