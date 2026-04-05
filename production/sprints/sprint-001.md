@@ -27,13 +27,13 @@ el combate terrestre para validar la hipótesis central del juego.
 
 ### In Progress
 
-_(empty)_
-
-### Ready (next up)
-
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
 | S1-07 | Prototipar Combate Terrestre (core loop jugable) | prototyper | S1-05, S1-06 | 3 unidades vs 2 enemigos, ataque+habilidad+guardia, victoria/derrota funcional |
+
+### Ready (next up)
+
+_(empty)_
 
 ### Backlog — Critical Path
 
