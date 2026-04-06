@@ -5,14 +5,14 @@ namespace BlacktideRequiem.Core.Data
 {
     /// <summary>
     /// Reference to an ability definition within a unit's ability pool.
-    /// Ability details (MP cost, damage, targeting) live in the ability data asset,
-    /// not here. This struct defines ownership and unlock conditions.
+    /// Ability details (MP cost, damage, targeting) live in the AbilityData asset.
+    /// This struct defines ownership and unlock conditions.
     /// </summary>
     [Serializable]
     public struct AbilityEntry
     {
-        [Tooltip("Reference to the ability definition (e.g., 'fireball')")]
-        public string AbilityId;
+        [Tooltip("Reference to the ability definition asset")]
+        public AbilityData Ability;
 
         [Tooltip("Level at which this ability becomes available (1 = immediate)")]
         [Min(1)]
