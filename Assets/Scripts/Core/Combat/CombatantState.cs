@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BlacktideRequiem.Core.Data;
 
@@ -35,6 +36,15 @@ namespace BlacktideRequiem.Core.Combat
 
         /// <summary>Whether this combatant is a boss (immune to Muerte).</summary>
         public bool IsBoss { get; set; }
+
+        /// <summary>Whether this combatant is currently guarding (50% damage reduction).</summary>
+        public bool IsGuarding { get; set; }
+
+        /// <summary>Whether this combatant has used Limit Break this round.</summary>
+        public bool LBUsedThisRound { get; set; }
+
+        /// <summary>Per-ability cooldown tracker (ability ID → remaining turns).</summary>
+        private readonly Dictionary<string, int> _cooldowns = new();
 
         public bool IsKO => CurrentHP <= 0;
 
@@ -80,6 +90,71 @@ namespace BlacktideRequiem.Core.Combat
             CurrentHP += actual;
             return actual;
         }
+
+        // ====================================================================
+        // ABILITY & COOLDOWN MANAGEMENT
+        // ====================================================================
+
+        /// <summary>
+        /// Checks if an ability is ready to use (enough MP, off cooldown, not silenced).
+        /// </summary>
+        public bool IsAbilityReady(AbilityData ability)
+        {
+            if (ability == null) return false;
+            if (CurrentMP < ability.MPCost) return false;
+            if (_cooldowns.TryGetValue(ability.Id, out int remaining) && remaining > 0) return false;
+            if (HasStatus(StatusEffect.Silencio)) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Deducts MP for an ability. Clamps to 0.
+        /// </summary>
+        public void ConsumeMP(int amount)
+        {
+            CurrentMP = Math.Max(0, CurrentMP - amount);
+        }
+
+        /// <summary>
+        /// Activates the cooldown for an ability after use.
+        /// </summary>
+        public void ActivateCooldown(AbilityData ability)
+        {
+            if (ability != null && ability.Cooldown > 0)
+                _cooldowns[ability.Id] = ability.Cooldown;
+        }
+
+        /// <summary>
+        /// Gets remaining cooldown turns for an ability (0 = ready).
+        /// </summary>
+        public int GetCooldownRemaining(AbilityData ability)
+        {
+            if (ability == null) return 0;
+            return _cooldowns.TryGetValue(ability.Id, out int remaining) ? remaining : 0;
+        }
+
+        /// <summary>
+        /// Decrements all cooldowns by 1. Called at start of combatant's turn.
+        /// </summary>
+        public void TickCooldowns()
+        {
+            var expired = new List<string>();
+            foreach (var kvp in _cooldowns)
+            {
+                if (kvp.Value <= 1)
+                    expired.Add(kvp.Key);
+            }
+            foreach (var key in expired)
+                _cooldowns.Remove(key);
+
+            var keys = new List<string>(_cooldowns.Keys);
+            foreach (var key in keys)
+                _cooldowns[key] = _cooldowns[key] - 1;
+        }
+
+        // ====================================================================
+        // STATUS EFFECTS
+        // ====================================================================
 
         /// <summary>
         /// Checks if this combatant has a specific status effect active.
