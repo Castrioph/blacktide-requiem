@@ -422,13 +422,13 @@ CritMod = 1.5 (assume crit)
 Variance = 0.98
 
 FinalDamage = floor(1389 × 3.5 × 1.25 × 1.5 × 0.98)
-            = floor(8,924.4)
-            = 8,924
+            = floor(8,933.0)
+            = 8,933
 
 Without crit:
 FinalDamage = floor(1389 × 3.5 × 1.25 × 1.0 × 0.98)
-            = floor(5,949.6)
-            = 5,949
+            = floor(5,955.3)
+            = 5,955
 ```
 
 ### Worked Example: Naval Combat
@@ -456,8 +456,8 @@ FinalDamage = floor(197 × 2.0 × 1.25 × 1.0 × 1.0 × 1.03)
 |----------|-----|-----|---------|---------------------|
 | Early (Lv 20, 3★, basic atk) | 130 | 110 | 1.0 | ~124 |
 | Mid (Lv 40, 4★, mid ability) | 290 | 220 | 2.0 | ~616 |
-| Late (Lv 80, 5★, strong ability) | 850 | 600 | 3.5 | ~5,950 |
-| Late + crit + buff + element | 850 (buffed→1105) | 600 | 3.5 | ~8,924 |
+| Late (Lv 80, 5★, strong ability) | 850 | 600 | 3.5 | ~5,955 |
+| Late + crit + buff + element | 850 (buffed→1105) | 600 | 3.5 | ~8,933 |
 
 Damage scales roughly **50-70x** from early to late game with all modifiers.
 This is consistent with FFBE-style gacha RPG scaling where late-game units deal
