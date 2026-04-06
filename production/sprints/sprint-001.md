@@ -1,6 +1,6 @@
 # Sprint 1 — Foundations & Core Loop Prototype
 
-> **Status**: Active
+> **Status**: Completed (2026-04-06)
 > **Method**: Kanban (no timeboxing — work until done)
 > **Created**: 2026-03-28
 > **WIP Limit**: 1 task in progress at a time
@@ -71,8 +71,8 @@ _(empty)_
 - [x] Prototipo de combate terrestre jugable (placeholder art)
 - [x] Core loop validado: seleccionar acción → resolver turno → victoria/derrota
 - [x] 5+ unit tests para Damage & Stats Engine
-- [ ] No S1/S2 bugs en features entregadas
-- [ ] Design documents actualizados si hay desviaciones
+- [x] No S1/S2 bugs en features entregadas
+- [x] Design documents actualizados si hay desviaciones
 
 ## Notes
 
