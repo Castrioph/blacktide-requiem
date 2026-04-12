@@ -341,7 +341,7 @@ namespace BlacktideRequiem.Tests.EditMode
         {
             // Arrange: two enemies, one hurt
             var buffAbility = MakeAbility("iron_wall", power: 1.0f,
-                category: AbilityCategory.Buff, targetType: TargetType.AllySingle);
+                category: AbilityCategory.Buff, targetType: TargetType.SingleAlly);
             var enemy1 = MakeCombatant("enemy1", 100, 50, 20, 80, abilities: new List<AbilityEntry>
             {
                 new AbilityEntry { Ability = buffAbility, UnlockLevel = 1 }

@@ -26,7 +26,7 @@ namespace BlacktideRequiem.Core.Combat
         SingleEnemy,
         AoeEnemy,
         Self,
-        AllySingle,
+        SingleAlly,
         AllyAoe
     }
 

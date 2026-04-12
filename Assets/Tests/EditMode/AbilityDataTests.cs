@@ -368,7 +368,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             var healAbility = MakeAbility("curar", mpCost: 15, power: 2.0f,
                 isPhysical: false, element: Element.Neutral,
-                targetType: TargetType.AllySingle, category: AbilityCategory.Heal);
+                targetType: TargetType.SingleAlly, category: AbilityCategory.Heal);
             healAbility.HealPower = 2.0f;
 
             var config = new BattleConfig

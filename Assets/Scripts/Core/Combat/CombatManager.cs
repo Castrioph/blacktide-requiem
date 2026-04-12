@@ -29,6 +29,7 @@ namespace BlacktideRequiem.Core.Combat
         public InitiativeEntry CurrentActor { get; private set; }
 
         // --- Dependencies ---
+        public InitiativeBar Bar => _bar;
         private readonly InitiativeBar _bar;
         private BattleConfig _config;
 
@@ -348,7 +349,7 @@ namespace BlacktideRequiem.Core.Combat
                     ResolveHealOrBuff(actor, actor, action);
                     break;
 
-                case TargetType.AllySingle:
+                case TargetType.SingleAlly:
                     if (action.Target != null)
                         ResolveHealOrBuff(actor, action.Target, action);
                     break;
