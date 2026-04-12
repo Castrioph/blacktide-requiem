@@ -1,0 +1,67 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+
+    <Style src="CombatHUD.uss" />
+
+    <!-- Zone 1: Initiative Bar -->
+    <ui:VisualElement name="initiative-bar" class="zone initiative-bar">
+        <ui:Label name="initiative-label" text="Turn Order" class="zone-title" />
+        <ui:VisualElement name="initiative-icons" class="initiative-icons" />
+    </ui:VisualElement>
+
+    <!-- Zone 2: Round / Wave Info -->
+    <ui:VisualElement name="round-info" class="zone round-info">
+        <ui:Label name="round-label" text="Round 1" class="round-text" />
+        <ui:Label name="wave-label" text="Wave 1/1" class="wave-text" />
+    </ui:VisualElement>
+
+    <!-- Zone 3: Battlefield -->
+    <ui:VisualElement name="battlefield" class="zone battlefield">
+        <ui:VisualElement name="ally-column" class="combatant-column ally-column">
+            <!-- Ally combatant cards injected here -->
+        </ui:VisualElement>
+        <ui:VisualElement name="enemy-column" class="combatant-column enemy-column">
+            <!-- Enemy combatant cards injected here -->
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+    <!-- Zone 5: Active Unit Info -->
+    <ui:VisualElement name="unit-info" class="zone unit-info">
+        <ui:Label name="unit-name" text="" class="unit-name" />
+        <ui:VisualElement name="unit-stats" class="unit-stats">
+            <ui:Label name="unit-hp-text" text="HP: 100/100" class="stat-text" />
+            <ui:Label name="unit-mp-text" text="MP: 50/50" class="stat-text" />
+            <ui:Label name="unit-atk-text" text="" class="stat-text" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+    <!-- Zone 6: Action Panel -->
+    <ui:VisualElement name="action-panel" class="zone action-panel">
+        <ui:VisualElement name="main-actions" class="action-grid">
+            <ui:Button name="btn-attack" text="Attack" class="action-btn attack-btn" />
+            <ui:Button name="btn-abilities" text="Abilities" class="action-btn abilities-btn" />
+            <ui:Button name="btn-guard" text="Guard" class="action-btn guard-btn" />
+            <ui:Button name="btn-pass" text="Pass" class="action-btn pass-btn" />
+        </ui:VisualElement>
+
+        <!-- Ability sub-menu (hidden by default) -->
+        <ui:VisualElement name="ability-menu" class="ability-menu hidden">
+            <ui:ScrollView name="ability-list" class="ability-list" />
+            <ui:Button name="btn-ability-back" text="Back" class="action-btn back-btn" />
+        </ui:VisualElement>
+
+        <!-- Target selection hint -->
+        <ui:Label name="target-hint" text="" class="target-hint hidden" />
+    </ui:VisualElement>
+
+    <!-- Battle Log -->
+    <ui:VisualElement name="battle-log-container" class="zone battle-log-container">
+        <ui:ScrollView name="battle-log" class="battle-log" />
+    </ui:VisualElement>
+
+    <!-- Victory / Defeat Overlay -->
+    <ui:VisualElement name="result-overlay" class="result-overlay hidden">
+        <ui:Label name="result-text" text="" class="result-text" />
+        <ui:Label name="result-details" text="" class="result-details" />
+    </ui:VisualElement>
+
+</ui:UXML>

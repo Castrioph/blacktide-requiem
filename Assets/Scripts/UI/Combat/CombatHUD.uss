@@ -1,0 +1,376 @@
+/* ============================================================
+   Combat HUD — Stylesheet
+   Portrait layout, 6 zones top-to-bottom.
+   See Combat UI GDD for zone definitions.
+   ============================================================ */
+
+/* --- Root & Zones --- */
+
+.zone {
+    padding: 4px 8px;
+}
+
+/* Zone 1: Initiative Bar */
+.initiative-bar {
+    flex-direction: column;
+    background-color: rgba(30, 20, 10, 0.85);
+    padding: 6px 8px;
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(120, 90, 50);
+}
+
+.zone-title {
+    font-size: 10px;
+    color: rgb(180, 160, 120);
+    -unity-text-align: middle-center;
+    margin-bottom: 2px;
+}
+
+.initiative-icons {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: nowrap;
+    min-height: 36px;
+}
+
+.init-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    border-width: 2px;
+    margin: 0 2px;
+    -unity-text-align: middle-center;
+    font-size: 10px;
+    color: white;
+    -unity-font-style: bold;
+}
+
+.init-icon-ally {
+    border-color: rgb(60, 130, 220);
+    background-color: rgb(40, 80, 140);
+}
+
+.init-icon-enemy {
+    border-color: rgb(200, 60, 50);
+    background-color: rgb(130, 40, 35);
+}
+
+.init-icon-active {
+    border-width: 3px;
+    border-color: rgb(255, 220, 80);
+    scale: 1.15 1.15;
+}
+
+/* Zone 2: Round Info */
+.round-info {
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgba(20, 15, 8, 0.7);
+    padding: 4px 12px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(80, 60, 35);
+}
+
+.round-text, .wave-text {
+    font-size: 12px;
+    color: rgb(200, 180, 140);
+    -unity-font-style: bold;
+}
+
+/* Zone 3: Battlefield */
+.battlefield {
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: rgba(15, 25, 35, 0.4);
+}
+
+.combatant-column {
+    flex-direction: column;
+    justify-content: center;
+    width: 45%;
+}
+
+.combatant-card {
+    flex-direction: column;
+    margin: 4px 0;
+    padding: 6px;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-width: 1px;
+    border-color: rgb(80, 70, 55);
+}
+
+.combatant-card-active {
+    border-color: rgb(255, 220, 80);
+    border-width: 2px;
+    background-color: rgba(60, 50, 20, 0.6);
+}
+
+.combatant-card-dead {
+    opacity: 0.35;
+}
+
+.combatant-card-targetable {
+    border-color: rgb(100, 200, 100);
+    border-width: 2px;
+}
+
+.combatant-name {
+    font-size: 11px;
+    color: rgb(220, 200, 160);
+    -unity-font-style: bold;
+    margin-bottom: 2px;
+}
+
+.hp-bar-bg {
+    height: 10px;
+    background-color: rgb(40, 30, 25);
+    border-radius: 3px;
+    margin-top: 2px;
+    overflow: hidden;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    background-color: rgb(50, 180, 70);
+    border-radius: 3px;
+    transition-property: width;
+    transition-duration: 0.3s;
+}
+
+.hp-bar-fill-warning {
+    background-color: rgb(220, 180, 30);
+}
+
+.hp-bar-fill-critical {
+    background-color: rgb(200, 50, 40);
+}
+
+.hp-text {
+    font-size: 9px;
+    color: rgb(180, 170, 150);
+    -unity-text-align: middle-right;
+    margin-top: 1px;
+}
+
+.mp-bar-bg {
+    height: 6px;
+    background-color: rgb(25, 25, 50);
+    border-radius: 2px;
+    margin-top: 2px;
+    overflow: hidden;
+}
+
+.mp-bar-fill {
+    height: 100%;
+    background-color: rgb(60, 100, 200);
+    border-radius: 2px;
+}
+
+.status-row {
+    flex-direction: row;
+    margin-top: 2px;
+}
+
+.status-icon {
+    font-size: 9px;
+    color: rgb(255, 200, 100);
+    margin-right: 4px;
+}
+
+/* Zone 5: Active Unit Info */
+.unit-info {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(25, 20, 12, 0.85);
+    padding: 6px 12px;
+    border-top-width: 1px;
+    border-top-color: rgb(80, 60, 35);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(80, 60, 35);
+    min-height: 36px;
+}
+
+.unit-name {
+    font-size: 14px;
+    color: rgb(255, 220, 100);
+    -unity-font-style: bold;
+}
+
+.unit-stats {
+    flex-direction: row;
+}
+
+.stat-text {
+    font-size: 11px;
+    color: rgb(180, 170, 150);
+    margin-left: 12px;
+}
+
+/* Zone 6: Action Panel */
+.action-panel {
+    background-color: rgba(30, 22, 12, 0.9);
+    padding: 8px;
+    border-top-width: 2px;
+    border-top-color: rgb(120, 90, 50);
+}
+
+.action-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.action-btn {
+    width: 48%;
+    height: 40px;
+    margin: 2px 1%;
+    border-radius: 6px;
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(240, 230, 200);
+    background-color: rgb(60, 45, 30);
+    border-width: 1px;
+    border-color: rgb(100, 80, 50);
+}
+
+.action-btn:hover {
+    background-color: rgb(80, 60, 40);
+    border-color: rgb(160, 130, 80);
+}
+
+.action-btn:active {
+    background-color: rgb(100, 75, 45);
+}
+
+.action-btn:disabled {
+    opacity: 0.4;
+}
+
+.attack-btn {
+    background-color: rgb(120, 45, 35);
+    border-color: rgb(170, 70, 50);
+}
+
+.attack-btn:hover {
+    background-color: rgb(150, 55, 40);
+}
+
+.guard-btn {
+    background-color: rgb(40, 65, 100);
+    border-color: rgb(60, 100, 150);
+}
+
+.guard-btn:hover {
+    background-color: rgb(50, 80, 120);
+}
+
+/* Ability sub-menu */
+.ability-menu {
+    flex-direction: column;
+}
+
+.ability-list {
+    max-height: 140px;
+}
+
+.ability-btn {
+    height: 36px;
+    margin: 2px 0;
+    border-radius: 4px;
+    font-size: 12px;
+    color: rgb(220, 210, 180);
+    background-color: rgb(50, 40, 60);
+    border-width: 1px;
+    border-color: rgb(90, 70, 110);
+    -unity-text-align: middle-left;
+    padding-left: 12px;
+}
+
+.ability-btn:hover {
+    background-color: rgb(70, 55, 85);
+}
+
+.ability-btn:disabled {
+    opacity: 0.4;
+}
+
+.back-btn {
+    width: 100%;
+    background-color: rgb(50, 40, 30);
+    margin-top: 4px;
+}
+
+.target-hint {
+    font-size: 12px;
+    color: rgb(255, 220, 100);
+    -unity-text-align: middle-center;
+    padding: 6px;
+    -unity-font-style: italic;
+}
+
+/* Battle Log */
+.battle-log-container {
+    max-height: 80px;
+    background-color: rgba(10, 8, 5, 0.8);
+    padding: 4px 8px;
+}
+
+.battle-log {
+    flex-grow: 1;
+}
+
+.log-entry {
+    font-size: 10px;
+    color: rgb(160, 150, 130);
+    margin: 1px 0;
+}
+
+.log-entry-damage {
+    color: rgb(220, 80, 60);
+}
+
+.log-entry-heal {
+    color: rgb(80, 200, 100);
+}
+
+.log-entry-status {
+    color: rgb(200, 180, 80);
+}
+
+.log-entry-system {
+    color: rgb(120, 180, 220);
+    -unity-font-style: italic;
+}
+
+/* Result Overlay */
+.result-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    justify-content: center;
+    align-items: center;
+}
+
+.result-text {
+    font-size: 36px;
+    -unity-font-style: bold;
+    color: rgb(255, 220, 80);
+    margin-bottom: 12px;
+}
+
+.result-details {
+    font-size: 14px;
+    color: rgb(200, 190, 170);
+}
+
+/* Utility */
+.hidden {
+    display: none;
+}
