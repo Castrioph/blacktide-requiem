@@ -186,9 +186,8 @@ namespace BlacktideRequiem.UI.Combat
         private void OnAttackClicked()
         {
             if (_state != UIState.ActionSelect) return;
-            _isAttackTargeting = true;
-            _selectedAbility = null;
             SetState(UIState.TargetSelect);
+            _isAttackTargeting = true;
             _targetHint.text = "Select an enemy to attack";
             _targetHint.RemoveFromClassList("hidden");
             HighlightTargets(isEnemyTarget: true);
@@ -224,8 +223,6 @@ namespace BlacktideRequiem.UI.Combat
 
         private void OnAbilitySelected(AbilityData ability)
         {
-            _selectedAbility = ability;
-
             // Self/AoE targets resolve immediately
             if (ability.TargetType == TargetType.Self ||
                 ability.TargetType == TargetType.AoeEnemy ||
@@ -239,6 +236,7 @@ namespace BlacktideRequiem.UI.Combat
             // Single target — enter targeting mode
             bool isEnemyTarget = ability.TargetType == TargetType.SingleEnemy;
             SetState(UIState.TargetSelect);
+            _selectedAbility = ability;
             _targetHint.text = isEnemyTarget ? "Select an enemy target" : "Select an ally target";
             _targetHint.RemoveFromClassList("hidden");
             HighlightTargets(isEnemyTarget);

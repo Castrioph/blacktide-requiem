@@ -100,6 +100,48 @@ namespace BlacktideRequiem.UI.Combat
             SetupButtons();
             SubscribeEvents();
             SetState(UIState.WaitingForTurn);
+            FixScrollContentAnchors();
+        }
+
+        /// <summary>
+        /// Ensures ScrollRect Content areas stretch horizontally and grow
+        /// vertically. Fixes anchors at runtime in case scene data is stale.
+        /// </summary>
+        private void FixScrollContentAnchors()
+        {
+            // Fix Viewport rects (must stretch to fill ScrollRect)
+            FixViewportRect(_battleLogScroll);
+            var abilityScroll = _abilityListContent?.GetComponentInParent<ScrollRect>();
+            FixViewportRect(abilityScroll);
+
+            // Fix Content rects
+            FixContentRect(_battleLogContent);
+            FixContentRect(_abilityListContent);
+        }
+
+        private static void FixViewportRect(ScrollRect scroll)
+        {
+            if (scroll == null || scroll.viewport == null) return;
+            var rt = scroll.viewport.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
+        private static void FixContentRect(Transform content)
+        {
+            if (content == null) return;
+            var rt = content.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(1, 1);
+            rt.pivot = new Vector2(0.5f, 1);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            var csf = content.GetComponent<ContentSizeFitter>();
+            if (csf == null) csf = content.gameObject.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
 
         private void OnDisable()
@@ -183,9 +225,8 @@ namespace BlacktideRequiem.UI.Combat
         private void OnAttackClicked()
         {
             if (_state != UIState.ActionSelect) return;
-            _isAttackTargeting = true;
-            _selectedAbility = null;
             SetState(UIState.TargetSelect);
+            _isAttackTargeting = true;
             _targetHintText.text = "Select an enemy to attack";
             HighlightTargets(isEnemyTarget: true);
         }
@@ -220,8 +261,6 @@ namespace BlacktideRequiem.UI.Combat
 
         private void OnAbilitySelected(AbilityData ability)
         {
-            _selectedAbility = ability;
-
             if (ability.TargetType == TargetType.Self ||
                 ability.TargetType == TargetType.AoeEnemy ||
                 ability.TargetType == TargetType.AllyAoe)
@@ -233,6 +272,7 @@ namespace BlacktideRequiem.UI.Combat
 
             bool isEnemyTarget = ability.TargetType == TargetType.SingleEnemy;
             SetState(UIState.TargetSelect);
+            _selectedAbility = ability;
             _targetHintText.text = isEnemyTarget ? "Select an enemy target" : "Select an ally target";
             HighlightTargets(isEnemyTarget);
         }
@@ -669,7 +709,26 @@ namespace BlacktideRequiem.UI.Combat
 
         private void AddLogEntry(string message, Color color)
         {
-            var textGo = CreateText(_battleLogContent, message, 12, color, TextAnchor.MiddleLeft, 18);
+            var go = new GameObject("Log", typeof(RectTransform), typeof(Text));
+            go.transform.SetParent(_battleLogContent, false);
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 0);
+            rt.anchorMax = new Vector2(1, 0);
+            rt.pivot = new Vector2(0, 0);
+            rt.sizeDelta = new Vector2(0, 20);
+
+            var txt = go.GetComponent<Text>();
+            txt.text = message;
+            txt.fontSize = 14;
+            txt.color = color;
+            txt.alignment = TextAnchor.MiddleLeft;
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            // Limit log entries to avoid unbounded growth
+            while (_battleLogContent.childCount > 50)
+                Destroy(_battleLogContent.GetChild(0).gameObject);
 
             // Auto-scroll to bottom
             Canvas.ForceUpdateCanvases();
