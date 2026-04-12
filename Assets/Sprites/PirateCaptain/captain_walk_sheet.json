@@ -1,0 +1,112 @@
+{
+  "image": "captain_walk_sheet.png",
+  "frameWidth": 128,
+  "frameHeight": 128,
+  "columns": 4,
+  "rows": 2,
+  "frameCount": 8,
+  "palette": [
+    "#0b0f14",
+    "#1f2933",
+    "#3a506b",
+    "#5bc0be",
+    "#f2f7f2",
+    "#ffbf69",
+    "#ee6c4d",
+    "#6b705c",
+    "#a5a58d",
+    "#b7b7a4",
+    "#d4a373",
+    "#588157",
+    "#3a5a40",
+    "#e0fbfc",
+    "#293241",
+    "#98c1d9"
+  ],
+  "frames": [
+    {
+      "name": "captain_walk_00",
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    },
+    {
+      "name": "captain_walk_01",
+      "index": 1,
+      "x": 128,
+      "y": 0,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    },
+    {
+      "name": "captain_walk_02",
+      "index": 2,
+      "x": 256,
+      "y": 0,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    },
+    {
+      "name": "captain_walk_03",
+      "index": 3,
+      "x": 384,
+      "y": 0,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    },
+    {
+      "name": "captain_walk_04",
+      "index": 4,
+      "x": 0,
+      "y": 128,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    },
+    {
+      "name": "captain_walk_05",
+      "index": 5,
+      "x": 128,
+      "y": 128,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    },
+    {
+      "name": "captain_walk_06",
+      "index": 6,
+      "x": 256,
+      "y": 128,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    },
+    {
+      "name": "captain_walk_07",
+      "index": 7,
+      "x": 384,
+      "y": 128,
+      "w": 128,
+      "h": 128,
+      "durationMs": 100
+    }
+  ],
+  "animations": {
+    "walk": [
+      "captain_walk_00",
+      "captain_walk_01",
+      "captain_walk_02",
+      "captain_walk_03",
+      "captain_walk_04",
+      "captain_walk_05",
+      "captain_walk_06",
+      "captain_walk_07"
+    ]
+  }
+}

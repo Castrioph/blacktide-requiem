@@ -36,13 +36,13 @@ into a shippable foundation.
 
 ### In Progress
 
-_(empty)_
-
-### Ready (next up)
-
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
 | S2-05 | Combat UI with UI Toolkit (HP bars, initiative bar, action buttons, battle log) | ui-programmer | S2-02 ✅ | Production UI using UXML/USS, driven by CombatManager events. Playable land battle with real UI |
+
+### Ready (next up)
+
+_(empty)_
 
 ### Backlog — Should Have
 
