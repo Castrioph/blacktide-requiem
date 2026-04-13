@@ -86,6 +86,10 @@ namespace BlacktideRequiem.Runtime.Combat
                     if (_manager.Phase == BattlePhase.Victory ||
                         _manager.Phase == BattlePhase.Defeat)
                         break;
+
+                    // Wave cleared mid-round — skip remaining turns, transition
+                    if (_manager.Phase == BattlePhase.InRound && _manager.IsCurrentWaveCleared)
+                        break;
                 }
 
                 // Check wave transition

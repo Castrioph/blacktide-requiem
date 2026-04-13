@@ -109,14 +109,49 @@ namespace BlacktideRequiem.UI.Combat
         /// </summary>
         private void FixScrollContentAnchors()
         {
+            // Fix AbilityMenu to stretch-fill ActionPanel
+            StretchToFillParent(_abilityMenu);
+
+            // Fix AbilityList ScrollRect to fill AbilityMenu, leaving 40px for BtnBack at bottom
+            var abilityScroll = _abilityListContent?.GetComponentInParent<ScrollRect>();
+            if (abilityScroll != null)
+            {
+                var scrollRt = abilityScroll.GetComponent<RectTransform>();
+                scrollRt.anchorMin = Vector2.zero;
+                scrollRt.anchorMax = Vector2.one;
+                scrollRt.offsetMin = new Vector2(0, 44); // leave room for BtnBack
+                scrollRt.offsetMax = Vector2.zero;
+            }
+
+            // Fix BtnBack anchored at bottom of AbilityMenu
+            if (_btnBack != null)
+            {
+                var backRt = _btnBack.GetComponent<RectTransform>();
+                backRt.anchorMin = new Vector2(0, 0);
+                backRt.anchorMax = new Vector2(1, 0);
+                backRt.pivot = new Vector2(0.5f, 0);
+                backRt.offsetMin = new Vector2(4, 4);
+                backRt.offsetMax = new Vector2(-4, 40);
+            }
+
             // Fix Viewport rects (must stretch to fill ScrollRect)
             FixViewportRect(_battleLogScroll);
-            var abilityScroll = _abilityListContent?.GetComponentInParent<ScrollRect>();
             FixViewportRect(abilityScroll);
 
             // Fix Content rects
             FixContentRect(_battleLogContent);
             FixContentRect(_abilityListContent);
+        }
+
+        private static void StretchToFillParent(GameObject go)
+        {
+            if (go == null) return;
+            var rt = go.GetComponent<RectTransform>();
+            if (rt == null) return;
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
         }
 
         private static void FixViewportRect(ScrollRect scroll)
@@ -142,6 +177,15 @@ namespace BlacktideRequiem.UI.Combat
             var csf = content.GetComponent<ContentSizeFitter>();
             if (csf == null) csf = content.gameObject.AddComponent<ContentSizeFitter>();
             csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            // Ensure VLG so children stretch horizontally and stack vertically
+            var vlg = content.GetComponent<VerticalLayoutGroup>();
+            if (vlg == null) vlg = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+            vlg.spacing = 4;
         }
 
         private void OnDisable()
@@ -280,6 +324,7 @@ namespace BlacktideRequiem.UI.Combat
         private void OnCombatantCardClicked(CombatantState combatant)
         {
             if (_state != UIState.TargetSelect) return;
+            if (combatant.IsKO) return;
 
             if (_isAttackTargeting)
             {
@@ -406,14 +451,22 @@ namespace BlacktideRequiem.UI.Combat
 
         private void HandleWaveComplete(int wave)
         {
-            AddLogEntry($"Wave {wave + 1} cleared!", LOG_SYSTEM);
+            int totalWaves = FindTotalWaves();
+            AddLogEntry($"Wave {wave + 1}/{totalWaves} cleared!", LOG_SYSTEM);
         }
 
         private void HandleWaveStart(int wave)
         {
-            _waveLabel.text = $"Wave {wave + 1}";
-            AddLogEntry($"Wave {wave + 1} begins!", LOG_SYSTEM);
+            int totalWaves = FindTotalWaves();
+            _waveLabel.text = $"Wave {wave + 1}/{totalWaves}";
+            AddLogEntry($"Wave {wave + 1}/{totalWaves} begins!", LOG_SYSTEM);
             RebuildEnemyCards();
+        }
+
+        private int FindTotalWaves()
+        {
+            var runner = FindAnyObjectByType<Runtime.Combat.CombatRunner>();
+            return runner?.Manager?.TotalWaves ?? 1;
         }
 
         private void HandleBattleEnd(BattleEndEvent e)
@@ -471,12 +524,19 @@ namespace BlacktideRequiem.UI.Combat
             if (runner == null) runner = FindAnyObjectByType<Runtime.Combat.CombatRunner>();
             if (runner?.Manager == null) return;
 
+            // Remove old enemy entries from tracking dict
+            var toRemove = new List<CombatantState>();
+            foreach (var kvp in _combatantCards)
+            {
+                if (kvp.Value != null && kvp.Value.transform.parent == _enemyColumn)
+                    toRemove.Add(kvp.Key);
+            }
+            foreach (var key in toRemove)
+                _combatantCards.Remove(key);
+
             ClearChildren(_enemyColumn);
             foreach (var enemy in runner.Manager.Enemies)
-            {
-                _combatantCards.Remove(enemy);
                 CreateCombatantCard(enemy, false, _enemyColumn);
-            }
         }
 
         private void CreateCombatantCard(CombatantState combatant, bool isAlly, Transform parent)
@@ -681,17 +741,24 @@ namespace BlacktideRequiem.UI.Combat
             foreach (var ability in abilities)
             {
                 string mpText = ability.MPCost > 0 ? $" [{ability.MPCost} MP]" : "";
-                var btnGo = new GameObject(ability.Id, typeof(RectTransform), typeof(Image), typeof(Button));
+                var btnGo = new GameObject(ability.Id, typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
                 btnGo.transform.SetParent(_abilityListContent, false);
 
-                var rt = btnGo.GetComponent<RectTransform>();
-                rt.sizeDelta = new Vector2(0, 40);
+                var le = btnGo.GetComponent<LayoutElement>();
+                le.preferredHeight = 40;
+                le.flexibleWidth = 1;
 
                 var img = btnGo.GetComponent<Image>();
                 img.color = new Color(0.2f, 0.16f, 0.24f);
 
                 var label = CreateText(btnGo.transform, $"{ability.DisplayName}{mpText}", 14,
                     new Color(0.86f, 0.82f, 0.7f), TextAnchor.MiddleLeft, 36);
+                // Stretch label to fill button
+                var labelRt = label.GetComponent<RectTransform>();
+                labelRt.anchorMin = Vector2.zero;
+                labelRt.anchorMax = Vector2.one;
+                labelRt.offsetMin = new Vector2(8, 0);
+                labelRt.offsetMax = new Vector2(-4, 0);
 
                 var actor = _playerInput.CurrentContext.Actor;
                 bool canAfford = actor == null || actor.CurrentMP >= ability.MPCost;
