@@ -33,12 +33,14 @@ into a shippable foundation.
 | S2-02 | Production CombatManager (land combat state machine + event bus) | gameplay-programmer | Manages full battle lifecycle, emits events for UI, uses existing InitiativeBar/DamageCalculator. 17 unit tests |
 | S2-04 | AbilityData ScriptableObject + ability resolution | gameplay-programmer | AbilityData SO (power, element, MP cost, cooldown, target type, secondary effects), CombatManager resolves them, cooldown tracking, MP consumption. 14 unit tests |
 | S2-03 | Enemy System (AI profiles: Agresivo, Defensivo, Caótico) | ai-programmer | 3 AI profiles, ICombatInput implementation, team-aware CombatContext. 16 unit tests |
+| S2-05 | Combat HUD with UGUI Canvas (HP bars, initiative bar, action buttons, battle log) | ui-programmer | Production UGUI Canvas driven by CombatManager events. Playable land battle with real UI. Pivoted from UI Toolkit to UGUI for faster iteration |
+| S2-06 | Traits/Sinergias basic (3 traits: Hijos del Mar, Malditos, Hierro Viejo) | gameplay-programmer | Trait detection + buff application in combat, enemy captain synergies, 13 unit tests |
 
 ### In Progress
 
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
-| S2-05 | Combat UI with UI Toolkit (HP bars, initiative bar, action buttons, battle log) | ui-programmer | S2-02 ✅ | Production UI using UXML/USS, driven by CombatManager events. Playable land battle with real UI |
+| S2-07 | Status Effects in combat (Aturdimiento, Sueño, Veneno, Ceguera) | gameplay-programmer | S2-02 ✅ | Status effects trigger from abilities, display in UI, 8+ unit tests |
 
 ### Ready (next up)
 
@@ -48,8 +50,8 @@ _(empty)_
 
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
-| S2-06 | Traits/Sinergias basic (3 traits: Hijos del Mar, Malditos, Hierro Viejo) | gameplay-programmer | S2-02 | Trait detection + buff application in combat, 5+ unit tests |
-| S2-07 | Status Effects in combat (Aturdimiento, Sueño, Veneno, Ceguera) | gameplay-programmer | S2-02 | Status effects trigger from abilities, display in UI, 8+ unit tests |
+| ~~S2-06~~ | ~~Traits/Sinergias basic~~ | — | — | Moved to Done |
+| ~~S2-07~~ | ~~Status Effects~~ | — | — | Moved to In Progress |
 | S2-08 | Ship Data Model (ShipData SO, ShipStatBlock, role slots) | gameplay-programmer | — | ScriptableObject creable, ship stats legible, 5+ unit tests |
 
 ### Backlog — Nice to Have
@@ -71,19 +73,19 @@ _(empty)_
 
 ## Definition of Done
 
-- [ ] Production land combat playable with UI Toolkit (not IMGUI)
-- [ ] Enemy AI makes autonomous decisions (3 profiles)
-- [ ] Abilities defined as ScriptableObjects with MP cost
-- [ ] Combat architecture documented in ADR
-- [ ] 25+ new unit tests across combat systems
+- [x] Production land combat playable with UGUI Canvas
+- [x] Enemy AI makes autonomous decisions (3 profiles)
+- [x] Abilities defined as ScriptableObjects with MP cost
+- [x] Combat architecture documented in ADR
+- [ ] 60+ unit tests across combat systems (S2-02: 17, S2-03: 16, S2-04: 14, S2-06: 13)
 - [ ] No S1/S2 bugs in delivered features
 - [ ] Design documents updated if any deviations
 
 ## Notes
 
-- UI Toolkit chosen over UGUI — user has professional web dev background
-  (HTML/CSS), making UXML/USS a natural fit. Also scales better for the
-  many menu screens needed in later sprints (gacha, roster, stage select).
+- UI Toolkit was originally planned but pivoted to UGUI Canvas for S2-05.
+  UGUI was faster to iterate on for the combat HUD. UI Toolkit may still
+  be used for menu screens in later sprints (gacha, roster, stage select).
 - The prototype (`Assets/Scripts/Prototypes/CombatV1/`) is reference only —
   production code must be rewritten to production standards in `Assets/Scripts/`.
 - All new production code requires doc comments on public APIs and unit tests.

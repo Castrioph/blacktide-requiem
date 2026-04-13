@@ -48,7 +48,7 @@ namespace BlacktideRequiem.Core.Data
 
         [Header("Traits")]
 
-        [Tooltip("1-3 trait tags that enable synergy bonuses")]
-        public List<string> Traits = new();
+        [Tooltip("1-3 trait entries with per-unit synergy bonuses")]
+        public List<UnitTraitEntry> Traits = new();
     }
 }

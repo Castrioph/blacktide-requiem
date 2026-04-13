@@ -43,6 +43,27 @@ namespace BlacktideRequiem.Core.Combat
         public IReadOnlyList<CombatantState> Allies => _allies;
         public IReadOnlyList<CombatantState> Enemies => _enemies;
 
+        // --- Synergy State ---
+        private List<ActiveSynergy> _allySynergiesPrimary = new();
+        private List<ActiveSynergy> _allySynergiesSecondary = new();
+        private List<ActiveSynergy> _enemySynergies = new();
+        private int _captainIndex;
+        private bool _isGuestFriend;
+
+        /// <summary>Currently active allied synergies (primary + secondary captain).</summary>
+        public IReadOnlyList<ActiveSynergy> AllySynergies
+        {
+            get
+            {
+                var all = new List<ActiveSynergy>(_allySynergiesPrimary);
+                all.AddRange(_allySynergiesSecondary);
+                return all;
+            }
+        }
+
+        /// <summary>Currently active enemy synergies.</summary>
+        public IReadOnlyList<ActiveSynergy> EnemySynergies => _enemySynergies;
+
         // --- Last action tracking (for tests and LB evaluation) ---
         private bool _lastActionWasPass;
 
@@ -69,10 +90,17 @@ namespace BlacktideRequiem.Core.Combat
             foreach (var entry in _allyEntries)
                 _allies.Add(entry.Combatant);
 
+            // Store captain config
+            _captainIndex = config.CaptainIndex;
+            _isGuestFriend = config.IsGuestFriend;
+
             // Setup first wave
             WaveIndex = 0;
             RoundNumber = 0;
             DeployWave(WaveIndex);
+
+            // Evaluate ally synergies (GDD: at combat start)
+            EvaluateAllySynergies();
 
             GameEvents.PublishBattleStart(new BattleStartEvent
             {
@@ -131,8 +159,18 @@ namespace BlacktideRequiem.Core.Combat
 
                 GameEvents.PublishTurnStart(combatant);
 
-                // Step 1: Tick buffs/debuffs and cooldowns
+                // Step 1: Tick buffs/debuffs, status durations, and cooldowns
                 combatant.Buffs.TickTurns();
+                var expiredStatuses = combatant.TickStatuses();
+                foreach (var effect in expiredStatuses)
+                {
+                    GameEvents.PublishStatusRemoved(new StatusRemovedEvent
+                    {
+                        Target = combatant,
+                        Effect = effect,
+                        Reason = StatusRemovalReason.Expired
+                    });
+                }
                 combatant.TickCooldowns();
 
                 // Step 2: Tick CC immunity
@@ -413,6 +451,18 @@ namespace BlacktideRequiem.Core.Combat
                     ? DamageSource.Ability : DamageSource.Attack
             });
 
+            // Wake sleeping targets on damage (GDD: Sueño removed by damage)
+            if (actual > 0 && target.HasStatus(StatusEffect.Sueno))
+            {
+                target.RemoveStatus(StatusEffect.Sueno);
+                GameEvents.PublishStatusRemoved(new StatusRemovedEvent
+                {
+                    Target = target,
+                    Effect = StatusEffect.Sueno,
+                    Reason = StatusRemovalReason.WokenByDamage
+                });
+            }
+
             if (target.IsKO)
             {
                 HandleDeath(target);
@@ -451,6 +501,13 @@ namespace BlacktideRequiem.Core.Combat
             {
                 if (UnityEngine.Random.value > effect.Probability) continue;
 
+                // Muerte: instant kill if target HP% below threshold (bosses immune)
+                if (effect.Effect == StatusEffect.Muerte)
+                {
+                    ResolveMuerte(source, target, effect.Param);
+                    continue;
+                }
+
                 var status = new StatusInstance
                 {
                     Effect = effect.Effect,
@@ -469,6 +526,32 @@ namespace BlacktideRequiem.Core.Combat
             }
         }
 
+        /// <summary>
+        /// Resolves Muerte (instant kill threshold). Kills target if HP% &lt; threshold.
+        /// Bosses are immune.
+        /// </summary>
+        private void ResolveMuerte(CombatantState source, CombatantState target, float threshold)
+        {
+            if (target.IsBoss) return;
+
+            float hpPercent = (float)target.CurrentHP / target.MaxHP;
+            if (hpPercent < threshold)
+            {
+                int lethalDamage = target.CurrentHP;
+                target.ApplyDamage(lethalDamage);
+
+                GameEvents.PublishDamageDealt(new DamageEvent
+                {
+                    Source = source,
+                    Target = target,
+                    ActualDamage = lethalDamage,
+                    DamageSource = DamageSource.Ability
+                });
+
+                HandleDeath(target);
+            }
+        }
+
         // ====================================================================
         // DEATH & BATTLE END
         // ====================================================================
@@ -479,6 +562,9 @@ namespace BlacktideRequiem.Core.Combat
             _bar.RemoveDead(combatant);
 
             combatant.IsGuarding = false;
+
+            // Synergy re-evaluation on captain KO (GDD §2, §4)
+            CheckCaptainKO(combatant);
 
             CheckBattleEnd();
         }
@@ -527,10 +613,143 @@ namespace BlacktideRequiem.Core.Combat
         {
             if (index < 0 || index >= TotalWaves) return;
 
+            // Remove previous wave's enemy synergies
+            SynergyEvaluator.RemoveBuffs(_enemySynergies);
+            _enemySynergies.Clear();
+
             _currentWaveEnemyEntries = new List<InitiativeEntry>(_config.Waves[index].Enemies);
             _enemies.Clear();
             foreach (var entry in _currentWaveEnemyEntries)
                 _enemies.Add(entry.Combatant);
+
+            // Evaluate enemy synergies for this wave
+            int enemyCaptainIdx = _config.Waves[index].EnemyCaptainIndex;
+            EvaluateEnemySynergies(enemyCaptainIdx);
+        }
+
+        // ====================================================================
+        // SYNERGY MANAGEMENT
+        // ====================================================================
+
+        /// <summary>
+        /// Evaluates and applies ally synergies (primary + secondary captain).
+        /// </summary>
+        private void EvaluateAllySynergies()
+        {
+            // Primary captain synergies
+            _allySynergiesPrimary = SynergyEvaluator.Evaluate(
+                _allies, _captainIndex, false);
+            SynergyEvaluator.ApplyBuffs(_allySynergiesPrimary);
+
+            foreach (var syn in _allySynergiesPrimary)
+                GameEvents.PublishSynergyActivated(new SynergyEvent
+                    { Synergy = syn, IsAllySide = true });
+
+            // Secondary captain synergies (friend guest)
+            _allySynergiesSecondary.Clear();
+            if (_isGuestFriend && _allies.Count > 1)
+            {
+                int guestIndex = _allies.Count - 1;
+                var secondarySynergies = SynergyEvaluator.Evaluate(
+                    _allies, guestIndex, false);
+                _allySynergiesSecondary = secondarySynergies;
+                SynergyEvaluator.ApplyBuffs(_allySynergiesSecondary);
+
+                foreach (var syn in _allySynergiesSecondary)
+                    GameEvents.PublishSynergyActivated(new SynergyEvent
+                        { Synergy = syn, IsAllySide = true });
+            }
+        }
+
+        /// <summary>
+        /// Removes all ally synergies and re-evaluates from scratch.
+        /// </summary>
+        private void ReEvaluateAllySynergies()
+        {
+            // Remove existing
+            SynergyEvaluator.RemoveBuffs(_allySynergiesPrimary);
+            foreach (var syn in _allySynergiesPrimary)
+                GameEvents.PublishSynergyDeactivated(new SynergyEvent
+                    { Synergy = syn, IsAllySide = true });
+
+            SynergyEvaluator.RemoveBuffs(_allySynergiesSecondary);
+            foreach (var syn in _allySynergiesSecondary)
+                GameEvents.PublishSynergyDeactivated(new SynergyEvent
+                    { Synergy = syn, IsAllySide = true });
+
+            _allySynergiesPrimary.Clear();
+            _allySynergiesSecondary.Clear();
+
+            // Re-evaluate (captain may have been revived or KO'd)
+            EvaluateAllySynergies();
+        }
+
+        /// <summary>
+        /// Evaluates and applies enemy synergies for the current wave.
+        /// </summary>
+        private void EvaluateEnemySynergies(int enemyCaptainIndex)
+        {
+            _enemySynergies = SynergyEvaluator.EvaluateEnemies(
+                _enemies, enemyCaptainIndex);
+            SynergyEvaluator.ApplyBuffs(_enemySynergies);
+
+            foreach (var syn in _enemySynergies)
+                GameEvents.PublishSynergyActivated(new SynergyEvent
+                    { Synergy = syn, IsAllySide = false });
+        }
+
+        /// <summary>
+        /// Checks if a dying combatant is a captain and deactivates synergies.
+        /// </summary>
+        private void CheckCaptainKO(CombatantState combatant)
+        {
+            // Allied primary captain KO
+            if (_captainIndex >= 0 && _captainIndex < _allies.Count
+                && _allies[_captainIndex] == combatant)
+            {
+                SynergyEvaluator.RemoveBuffs(_allySynergiesPrimary);
+                foreach (var syn in _allySynergiesPrimary)
+                    GameEvents.PublishSynergyDeactivated(new SynergyEvent
+                        { Synergy = syn, IsAllySide = true });
+                _allySynergiesPrimary.Clear();
+            }
+
+            // Allied secondary captain (friend guest) KO
+            if (_isGuestFriend && _allies.Count > 1
+                && _allies[_allies.Count - 1] == combatant)
+            {
+                SynergyEvaluator.RemoveBuffs(_allySynergiesSecondary);
+                foreach (var syn in _allySynergiesSecondary)
+                    GameEvents.PublishSynergyDeactivated(new SynergyEvent
+                        { Synergy = syn, IsAllySide = true });
+                _allySynergiesSecondary.Clear();
+            }
+
+            // Enemy captain KO — deactivate all enemy synergies
+            int enemyCaptainIdx = _config.Waves[WaveIndex].EnemyCaptainIndex;
+            if (enemyCaptainIdx >= 0 && enemyCaptainIdx < _enemies.Count
+                && _enemies[enemyCaptainIdx] == combatant)
+            {
+                SynergyEvaluator.RemoveBuffs(_enemySynergies);
+                foreach (var syn in _enemySynergies)
+                    GameEvents.PublishSynergyDeactivated(new SynergyEvent
+                        { Synergy = syn, IsAllySide = false });
+                _enemySynergies.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Call when a captain is revived to reactivate their synergies.
+        /// </summary>
+        public void OnCaptainRevived(CombatantState combatant)
+        {
+            bool isPrimaryCaptain = _captainIndex >= 0 && _captainIndex < _allies.Count
+                && _allies[_captainIndex] == combatant;
+            bool isSecondaryCaptain = _isGuestFriend && _allies.Count > 1
+                && _allies[_allies.Count - 1] == combatant;
+
+            if (isPrimaryCaptain || isSecondaryCaptain)
+                ReEvaluateAllySynergies();
         }
 
         // ====================================================================

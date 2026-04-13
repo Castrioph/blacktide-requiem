@@ -58,6 +58,9 @@ namespace BlacktideRequiem.Core.Events
         /// <summary>Fired when a status effect is applied.</summary>
         public static event Action<StatusAppliedEvent> OnStatusApplied;
 
+        /// <summary>Fired when a status effect is removed (expired, consumed, or cleansed).</summary>
+        public static event Action<StatusRemovedEvent> OnStatusRemoved;
+
         /// <summary>Fired when a buff/debuff expires.</summary>
         public static event Action<BuffInstance> OnBuffExpired;
 
@@ -75,6 +78,14 @@ namespace BlacktideRequiem.Core.Events
         /// <summary>Fired when a Limit Break extra turn is inserted.</summary>
         public static event Action<CombatantState> OnLimitBreakActivated;
 
+        // --- Synergy Events ---
+
+        /// <summary>Fired when a synergy activates (at combat start or captain revive).</summary>
+        public static event Action<SynergyEvent> OnSynergyActivated;
+
+        /// <summary>Fired when a synergy deactivates (captain KO or enemy captain killed).</summary>
+        public static event Action<SynergyEvent> OnSynergyDeactivated;
+
         // --- Publish Methods ---
 
         public static void PublishBattleStart(BattleStartEvent e) => OnBattleStart?.Invoke(e);
@@ -90,11 +101,14 @@ namespace BlacktideRequiem.Core.Events
         public static void PublishHealApplied(HealEvent e) => OnHealApplied?.Invoke(e);
         public static void PublishBuffApplied(BuffInstance b) => OnBuffApplied?.Invoke(b);
         public static void PublishStatusApplied(StatusAppliedEvent e) => OnStatusApplied?.Invoke(e);
+        public static void PublishStatusRemoved(StatusRemovedEvent e) => OnStatusRemoved?.Invoke(e);
         public static void PublishBuffExpired(BuffInstance b) => OnBuffExpired?.Invoke(b);
         public static void PublishUnitDied(CombatantState c) => OnUnitDied?.Invoke(c);
         public static void PublishUnitRevived(CombatantState c) => OnUnitRevived?.Invoke(c);
         public static void PublishGuardActivated(CombatantState c) => OnGuardActivated?.Invoke(c);
         public static void PublishLimitBreakActivated(CombatantState c) => OnLimitBreakActivated?.Invoke(c);
+        public static void PublishSynergyActivated(SynergyEvent e) => OnSynergyActivated?.Invoke(e);
+        public static void PublishSynergyDeactivated(SynergyEvent e) => OnSynergyDeactivated?.Invoke(e);
 
         /// <summary>
         /// Removes all subscribers. Call during scene transitions to prevent leaks.
@@ -114,11 +128,14 @@ namespace BlacktideRequiem.Core.Events
             OnHealApplied = null;
             OnBuffApplied = null;
             OnStatusApplied = null;
+            OnStatusRemoved = null;
             OnBuffExpired = null;
             OnUnitDied = null;
             OnUnitRevived = null;
             OnGuardActivated = null;
             OnLimitBreakActivated = null;
+            OnSynergyActivated = null;
+            OnSynergyDeactivated = null;
         }
     }
 
@@ -180,5 +197,26 @@ namespace BlacktideRequiem.Core.Events
         public CombatantState Source;
         public CombatantState Target;
         public StatusInstance Status;
+    }
+
+    public enum StatusRemovalReason
+    {
+        Expired,
+        Consumed,
+        WokenByDamage,
+        Cleansed
+    }
+
+    public struct StatusRemovedEvent
+    {
+        public CombatantState Target;
+        public StatusEffect Effect;
+        public StatusRemovalReason Reason;
+    }
+
+    public struct SynergyEvent
+    {
+        public ActiveSynergy Synergy;
+        public bool IsAllySide;
     }
 }

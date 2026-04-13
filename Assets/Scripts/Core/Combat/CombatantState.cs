@@ -187,6 +187,26 @@ namespace BlacktideRequiem.Core.Combat
         }
 
         /// <summary>
+        /// Decrements status durations and removes expired ones.
+        /// Returns list of expired effects for event publishing.
+        /// Call at the start of the combatant's turn (after buff tick).
+        /// </summary>
+        public List<StatusEffect> TickStatuses()
+        {
+            var expired = new List<StatusEffect>();
+            for (int i = StatusEffects.Count - 1; i >= 0; i--)
+            {
+                StatusEffects[i].RemainingTurns--;
+                if (StatusEffects[i].RemainingTurns <= 0)
+                {
+                    expired.Add(StatusEffects[i].Effect);
+                    StatusEffects.RemoveAt(i);
+                }
+            }
+            return expired;
+        }
+
+        /// <summary>
         /// Removes a specific status effect if present.
         /// </summary>
         public bool RemoveStatus(StatusEffect effect)

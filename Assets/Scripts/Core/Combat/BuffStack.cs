@@ -117,6 +117,14 @@ namespace BlacktideRequiem.Core.Combat
         }
 
         /// <summary>
+        /// Removes a buff at a specific index. Used by SynergyEvaluator for targeted removal.
+        /// </summary>
+        public void RemoveAt(int index)
+        {
+            _buffs.RemoveAt(index);
+        }
+
+        /// <summary>
         /// Removes all buffs and debuffs.
         /// </summary>
         public void Clear()
