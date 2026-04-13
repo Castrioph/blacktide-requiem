@@ -1,58 +1,39 @@
-# Claude Code Game Studios -- Game Studio Agent Architecture
+# Claude Code Game Studios
 
-Indie game development managed through 48 coordinated Claude Code subagents.
-Each agent owns a specific domain, enforcing separation of concerns and quality.
+Unity 6.3 LTS project using C# and URP. Keep changes small, reversible, and
+easy to verify.
 
-## Technology Stack
+## Startup Order
 
-- **Engine**: Unity 6.3 LTS (6000.3)
-- **Language**: C#
-- **Version Control**: Git with Conventional Commits + Conventional Branches
-- **Build System**: Unity Build Pipeline
-- **Asset Pipeline**: Unity Asset Import Pipeline + Addressables
+1. Read `production/session-state/active.md` first if it exists.
+2. If state is missing or stale, read `.claude/docs/project-map.md`.
+3. Read `.claude/docs/decision-log.md` only if the task needs architectural context.
+4. Read the current sprint file before broad repo exploration.
 
-> **Note**: Engine-specialist agents exist for Godot, Unity, and Unreal with
-> dedicated sub-specialists. Use the set matching your engine.
+## Working Rules
 
-## Project Structure
+- Prefer direct reads of named files over broad repo scans.
+- Production runtime code lives in `Assets/Scripts/Core/`.
+- EditMode tests live in `Assets/Tests/EditMode/`.
+- Prototype code under `Assets/Scripts/Prototypes/` is reference only.
+- Ask before commits or risky cross-cutting changes.
+- Preserve user changes already present in the worktree.
+- Keep `production/session-state/active.md` under 40 lines.
+- Update `active.md` at milestones, before `/clear`, and before ending a session.
 
-@.claude/docs/directory-structure.md
+## High-Value References
 
-## Engine Version Reference
+- Project map: `.claude/docs/project-map.md`
+- Stable decisions: `.claude/docs/decision-log.md`
+- Session workflow: `.claude/docs/session-playbook.md`
+- Session template: `.claude/docs/session-state-template.md`
+- Current sprint: `production/sprints/sprint-002.md`
+- Combat architecture: `docs/architecture/adr-003-combat-architecture.md`
 
-@docs/engine-reference/unity/VERSION.md
+## Deep References
 
-## Technical Preferences
+Use only when relevant to the current task:
 
-@.claude/docs/technical-preferences.md
-
-## Coordination Rules
-
-@.claude/docs/coordination-rules.md
-
-## Collaboration Protocol
-
-**User-driven collaboration, not autonomous execution.**
-Every task follows: **Question -> Options -> Decision -> Draft -> Approval**
-
-- Agents MUST ask "May I write this to [filepath]?" before using Write/Edit tools
-- Agents MUST show drafts or summaries before requesting approval
-- Multi-file changes require explicit approval for the full changeset
-- No commits without user instruction
-
-See `docs/COLLABORATIVE-DESIGN-PRINCIPLE.md` for full protocol and examples.
-
-> **First session?** If the project has no engine configured and no game concept,
-> run `/start` to begin the guided onboarding flow.
-
-## Git Conventions
-
-@docs/git-conventions.md
-
-## Coding Standards
-
-@.claude/docs/coding-standards.md
-
-## Context Management
-
-@.claude/docs/context-management.md
+- `.claude/docs/technical-preferences.md`
+- `.claude/docs/coding-standards.md`
+- `docs/COLLABORATIVE-DESIGN-PRINCIPLE.md`
