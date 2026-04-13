@@ -35,12 +35,13 @@ into a shippable foundation.
 | S2-03 | Enemy System (AI profiles: Agresivo, Defensivo, Caótico) | ai-programmer | 3 AI profiles, ICombatInput implementation, team-aware CombatContext. 16 unit tests |
 | S2-05 | Combat HUD with UGUI Canvas (HP bars, initiative bar, action buttons, battle log) | ui-programmer | Production UGUI Canvas driven by CombatManager events. Playable land battle with real UI. Pivoted from UI Toolkit to UGUI for faster iteration |
 | S2-06 | Traits/Sinergias basic (3 traits: Hijos del Mar, Malditos, Hierro Viejo) | gameplay-programmer | Trait detection + buff application in combat, enemy captain synergies, 13 unit tests |
+| S2-07 | Status Effects in combat (Aturdimiento, Sueño, Veneno, Ceguera) | gameplay-programmer | Status effect duration ticking, sleep-wake, Muerte, Silencio. 12 unit tests |
 
 ### In Progress
 
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
-| S2-07 | Status Effects in combat (Aturdimiento, Sueño, Veneno, Ceguera) | gameplay-programmer | S2-02 ✅ | Status effects trigger from abilities, display in UI, 8+ unit tests |
+| S2-08 | Ship Data Model (ShipData SO, ShipStatBlock, role slots) | gameplay-programmer | — | ScriptableObject creable, ship stats legible, 5+ unit tests |
 
 ### Ready (next up)
 
@@ -51,8 +52,8 @@ _(empty)_
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
 | ~~S2-06~~ | ~~Traits/Sinergias basic~~ | — | — | Moved to Done |
-| ~~S2-07~~ | ~~Status Effects~~ | — | — | Moved to In Progress |
-| S2-08 | Ship Data Model (ShipData SO, ShipStatBlock, role slots) | gameplay-programmer | — | ScriptableObject creable, ship stats legible, 5+ unit tests |
+| ~~S2-07~~ | ~~Status Effects~~ | — | — | Moved to Done |
+| ~~S2-08~~ | ~~Ship Data Model~~ | — | — | Moved to In Progress |
 
 ### Backlog — Nice to Have
 
