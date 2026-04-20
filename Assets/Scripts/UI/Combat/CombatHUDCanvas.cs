@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using BlacktideRequiem.Core.Combat;
 using BlacktideRequiem.Core.Data;
 using BlacktideRequiem.Core.Events;
+using BlacktideRequiem.Runtime.Flow;
 
 namespace BlacktideRequiem.UI.Combat
 {
@@ -56,6 +57,7 @@ namespace BlacktideRequiem.UI.Combat
         [SerializeField] private GameObject _resultOverlay;
         [SerializeField] private Text _resultText;
         [SerializeField] private Text _resultDetails;
+        [SerializeField] private Button _btnContinue;
 
         // --- State ---
         private PlayerCombatInput _playerInput;
@@ -206,6 +208,8 @@ namespace BlacktideRequiem.UI.Combat
             _btnGuard.onClick.AddListener(OnGuardClicked);
             _btnPass.onClick.AddListener(OnPassClicked);
             _btnBack.onClick.AddListener(OnAbilityBackClicked);
+            if (_btnContinue != null)
+                _btnContinue.onClick.AddListener(OnContinueClicked);
         }
 
         private void SubscribeEvents()
@@ -303,6 +307,12 @@ namespace BlacktideRequiem.UI.Combat
             SetState(UIState.ActionSelect);
         }
 
+        private void OnContinueClicked()
+        {
+            if (GameFlowManager.Instance != null)
+                GameFlowManager.Instance.LoadResults();
+        }
+
         private void OnAbilitySelected(AbilityData ability)
         {
             if (ability.TargetType == TargetType.Self ||
@@ -346,6 +356,8 @@ namespace BlacktideRequiem.UI.Combat
         {
             AddLogEntry($"Battle started! {e.AllyCount} allies vs {e.EnemyCount} enemies ({e.TotalWaves} waves)", LOG_SYSTEM);
             _resultOverlay.SetActive(false);
+            if (_btnContinue != null)
+                _btnContinue.gameObject.SetActive(false);
         }
 
         private void HandleRoundStart(int round)
@@ -488,6 +500,9 @@ namespace BlacktideRequiem.UI.Combat
             }
 
             AddLogEntry($"=== {e.Result} ===", LOG_SYSTEM);
+
+            if (_btnContinue != null)
+                _btnContinue.gameObject.SetActive(true);
         }
 
         private void HandleStatusApplied(StatusAppliedEvent e)
