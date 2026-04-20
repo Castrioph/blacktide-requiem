@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c2ad987717cf274da9873683870758e, type: 3}
+  m_Name: elena_tempestad
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.CharacterData
+  Id: elena_tempestad
+  DisplayName: Elena
+  Description: Maga de tormenta que desata rayos y sellos arcanos.
+  BaseStats:
+    HP: 320
+    MP: 110
+    ATK: 45
+    DEF: 30
+    MST: 70
+    SPR: 42
+    SPD: 75
+  SecondaryStats:
+    CRI: 7
+    LCK: 6
+  Element: 2
+  LandAbilities:
+  - Ability: {fileID: 11400000, guid: fa450354e1376ef4092ecfe2b1958fb8, type: 2}
+    UnlockLevel: 1
+    Source: 0
+    CanLimitBreak: 0
+    LBCondition: 0
+    LBConditionParam: -1
+    LBConditionTarget: 
+  - Ability: {fileID: 11400000, guid: 2c055cb33f2c25d4885137a946e5cc95, type: 2}
+    UnlockLevel: 1
+    Source: 0
+    CanLimitBreak: 0
+    LBCondition: 0
+    LBConditionParam: -1
+    LBConditionTarget: 
+  - Ability: {fileID: 11400000, guid: b88b5cbe2d548a543bc915b252780b74, type: 2}
+    UnlockLevel: 1
+    Source: 0
+    CanLimitBreak: 0
+    LBCondition: 0
+    LBConditionParam: -1
+    LBConditionTarget: 
+  SeaAbilities: []
+  Traits: []

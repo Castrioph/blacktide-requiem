@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42947b7479958054791ab26c9df67a95, type: 3}
+  m_Name: searing_shot
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.AbilityData
+  Id: searing_shot
+  DisplayName: Disparo Ardiente
+  Description: Bala incendiaria que prende al objetivo.
+  AbilityPower: 1.2
+  Element: 1
+  IsPhysical: 1
+  TargetType: 0
+  Category: 0
+  MPCost: 12
+  Cooldown: 2
+  HealPower: 0
+  ReviveHPPercent: 0.3
+  SecondaryEffects:
+  - Effect: 2
+    Probability: 0.6
+    Duration: 3
+    Param: 0.05

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42947b7479958054791ab26c9df67a95, type: 3}
+  m_Name: lullaby
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.AbilityData
+  Id: lullaby
+  DisplayName: "Canci\xF3n de Cuna"
+  Description: "Melod\xEDa que duerme al enemigo mientras causa da\xF1o leve."
+  AbilityPower: 0.3
+  Element: 0
+  IsPhysical: 0
+  TargetType: 0
+  Category: 3
+  MPCost: 14
+  Cooldown: 3
+  HealPower: 0
+  ReviveHPPercent: 0.3
+  SecondaryEffects:
+  - Effect: 4
+    Probability: 0.8
+    Duration: 2
+    Param: 0

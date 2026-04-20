@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c2ad987717cf274da9873683870758e, type: 3}
+  m_Name: mirra_mareamadre
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.CharacterData
+  Id: mirra_mareamadre
+  DisplayName: Mirra
+  Description: Sanadora ritual que canaliza el mar en bendiciones y cantos.
+  BaseStats:
+    HP: 280
+    MP: 130
+    ATK: 35
+    DEF: 25
+    MST: 58
+    SPR: 52
+    SPD: 65
+  SecondaryStats:
+    CRI: 4
+    LCK: 8
+  Element: 0
+  LandAbilities:
+  - Ability: {fileID: 11400000, guid: 6c3f9b623ffbc984e8a8980f38a7cd7d, type: 2}
+    UnlockLevel: 1
+    Source: 0
+    CanLimitBreak: 0
+    LBCondition: 0
+    LBConditionParam: -1
+    LBConditionTarget: 
+  - Ability: {fileID: 11400000, guid: c66d3a96d661c0949b71dcb6c3551a24, type: 2}
+    UnlockLevel: 1
+    Source: 0
+    CanLimitBreak: 0
+    LBCondition: 0
+    LBConditionParam: -1
+    LBConditionTarget: 
+  - Ability: {fileID: 11400000, guid: 1186644e97213a84b92cb1817ea644a7, type: 2}
+    UnlockLevel: 1
+    Source: 0
+    CanLimitBreak: 0
+    LBCondition: 0
+    LBConditionParam: -1
+    LBConditionTarget: 
+  SeaAbilities: []
+  Traits: []

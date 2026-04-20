@@ -36,12 +36,13 @@ into a shippable foundation.
 | S2-05 | Combat HUD with UGUI Canvas (HP bars, initiative bar, action buttons, battle log) | ui-programmer | Production UGUI Canvas driven by CombatManager events. Playable land battle with real UI. Pivoted from UI Toolkit to UGUI for faster iteration |
 | S2-06 | Traits/Sinergias basic (3 traits: Hijos del Mar, Malditos, Hierro Viejo) | gameplay-programmer | Trait detection + buff application in combat, enemy captain synergies, 13 unit tests |
 | S2-07 | Status Effects in combat (Aturdimiento, Sueño, Veneno, Ceguera) | gameplay-programmer | Status effect duration ticking, sleep-wake, Muerte, Silencio. 12 unit tests |
+| S2-08 | Ship Data Model (ShipData SO, ShipStatBlock, role slots, crew contribution, upgrades) | gameplay-programmer | ScriptableObject creable, ship stats legible, 12 unit tests |
+| S2-09 | Game Flow / Scene Manager (basic screen transitions) | engine-programmer | MainMenu → CombatDemo → Results → MainMenu loop. GameFlowManager singleton (DontDestroyOnLoad), SceneRegistry, MainMenu/Results controllers, Continue button wired in HUD. 10 EditMode tests |
+| S2-10 | 3 demo CharacterData SOs (Elena/Kael/Mirra) + 9 AbilityData SOs, 3 elements, 3 roles | game-designer | DemoRosterFactory shared spec, `Blacktide > Create Demo Character Assets` editor menu generates 9 ability + 3 character .asset files under `Assets/Data/`. Abilities span Damage/Heal/Debuff × single/AoE with Silencio/Quemadura/Sueño secondaries. 18 EditMode tests |
 
 ### In Progress
 
-| ID | Task | Owner | Dependencies | Acceptance Criteria |
-|----|------|-------|-------------|---------------------|
-| S2-08 | Ship Data Model (ShipData SO, ShipStatBlock, role slots) | gameplay-programmer | — | ScriptableObject creable, ship stats legible, 5+ unit tests |
+_(empty)_
 
 ### Ready (next up)
 
@@ -53,14 +54,14 @@ _(empty)_
 |----|------|-------|-------------|---------------------|
 | ~~S2-06~~ | ~~Traits/Sinergias basic~~ | — | — | Moved to Done |
 | ~~S2-07~~ | ~~Status Effects~~ | — | — | Moved to Done |
-| ~~S2-08~~ | ~~Ship Data Model~~ | — | — | Moved to In Progress |
+| ~~S2-08~~ | ~~Ship Data Model~~ | — | — | Moved to Done |
 
 ### Backlog — Nice to Have
 
 | ID | Task | Owner | Dependencies | Acceptance Criteria |
 |----|------|-------|-------------|---------------------|
-| S2-09 | Game Flow / Scene Manager (basic screen transitions) | engine-programmer | — | Main Menu → Combat → Results flow working |
-| S2-10 | Create 3 demo CharacterData SOs (from vertical slice roster) | game-designer | S2-04 | 3 playable units with abilities, varied elements/roles |
+| ~~S2-09~~ | ~~Game Flow / Scene Manager~~ | — | — | Moved to Done |
+| ~~S2-10~~ | ~~3 demo CharacterData SOs~~ | — | — | Moved to Done |
 
 ---
 
@@ -78,7 +79,7 @@ _(empty)_
 - [x] Enemy AI makes autonomous decisions (3 profiles)
 - [x] Abilities defined as ScriptableObjects with MP cost
 - [x] Combat architecture documented in ADR
-- [ ] 60+ unit tests across combat systems (S2-02: 17, S2-03: 16, S2-04: 14, S2-06: 13)
+- [x] 60+ unit tests across combat systems (S2-02: 17, S2-03: 16, S2-04: 14, S2-06: 13, S2-07: 12, S2-08: 12, S2-09: 10, S2-10: 18 = 112 total)
 - [ ] No S1/S2 bugs in delivered features
 - [ ] Design documents updated if any deviations
 

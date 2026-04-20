@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42947b7479958054791ab26c9df67a95, type: 3}
+  m_Name: storm_bolt
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.AbilityData
+  Id: storm_bolt
+  DisplayName: Rayo de Tormenta
+  Description: "Descarga el\xE9ctrica sobre un enemigo."
+  AbilityPower: 1.4
+  Element: 2
+  IsPhysical: 0
+  TargetType: 0
+  Category: 0
+  MPCost: 8
+  Cooldown: 0
+  HealPower: 0
+  ReviveHPPercent: 0.3
+  SecondaryEffects: []
