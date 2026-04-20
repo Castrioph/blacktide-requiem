@@ -54,6 +54,8 @@ export_presets.cfg
 [Bb]uilds/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
+[Aa]ssets/_[Rr]ecovery/
+[Aa]ssets/_[Rr]ecovery.meta
 *.csproj
 *.unityproj
 *.sln
