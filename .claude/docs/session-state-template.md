@@ -20,6 +20,7 @@ Task:
 
 ## Verification
 
+- Path: editor-tools / batchmode / manual
 - Exact command or short note if not run yet
 
 ## Next Step

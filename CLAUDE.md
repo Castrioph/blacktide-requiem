@@ -13,6 +13,11 @@ easy to verify.
 ## Working Rules
 
 - Prefer direct reads of named files over broad repo scans.
+- For Coplay or Unity editor verification, emit a 3-step plan and choose one
+  path before using tools: `editor-tools`, `batchmode`, or `manual`.
+- Skip Coplay tool discovery when the required tool is already permitted.
+- Do not read full test files unless debugging a failure or building a minimal
+  runner depends on their contents.
 - Production runtime code lives in `Assets/Scripts/Core/`.
 - EditMode tests live in `Assets/Tests/EditMode/`.
 - Prototype code under `Assets/Scripts/Prototypes/` is reference only.
