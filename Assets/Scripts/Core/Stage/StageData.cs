@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using BlacktideRequiem.Core.Data;
+using BlacktideRequiem.Core.Economy;
 
 namespace BlacktideRequiem.Core.Stage
 {
@@ -13,6 +14,7 @@ namespace BlacktideRequiem.Core.Stage
         [TextArea] public string Description;
         [Range(1, 5)] public int DifficultyLevel;
         public List<WaveDefinition> Waves = new List<WaveDefinition>();
+        public RewardTable Rewards;
     }
 
     [Serializable]
