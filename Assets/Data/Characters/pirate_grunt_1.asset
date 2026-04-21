@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c2ad987717cf274da9873683870758e, type: 3}
+  m_Name: pirate_grunt_1
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.CharacterData
+  Id: pirate_grunt_1
+  DisplayName: Pirate Grunt
+  Description: A common pirate with brute strength and no finesse.
+  BaseStats:
+    HP: 180
+    MP: 0
+    ATK: 40
+    DEF: 20
+    MST: 15
+    SPR: 15
+    SPD: 50
+  SecondaryStats:
+    CRI: 5
+    LCK: 5
+  Element: 0
+  LandAbilities: []
+  SeaAbilities: []
+  Traits: []
