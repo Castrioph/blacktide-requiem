@@ -32,8 +32,9 @@ easy to verify.
 - Stable decisions: `.claude/docs/decision-log.md`
 - Session workflow: `.claude/docs/session-playbook.md`
 - Session template: `.claude/docs/session-state-template.md`
-- Current sprint: `production/sprints/sprint-002.md`
+- Current sprint: `production/sprints/sprint-003.md`
 - Combat architecture: `docs/architecture/adr-003-combat-architecture.md`
+- **Coplay + Unity UI lessons (LEER antes de cualquier tarea UI):** `.claude/docs/coplay-unity-lessons.md`
 
 ## Deep References
 
