@@ -28,6 +28,7 @@ prototype into a playable demo shell. Naval + Gacha deferred to Sprint 4.
 |----|------|-------|------|---------------------|
 | S3-01 | Currency System impl (Wallet SO, Doblones + GemasDeCalavera, event on change) | gameplay-programmer | S | CurrencyWallet SO with Add/TrySpend/GetBalance/ResetBalances, BalanceChanged event, atomic transactions, MAX_BALANCE clamp, 19 EditMode tests |
 | S3-04 | Refactor DemoBattleSetup to consume `Assets/Data/` .asset files (retro action #2) | gameplay-programmer | S | DemoBattleSetup loads CharacterData from SO, no inline instances. 4 enemy assets added. Inspector wiring required. |
+| S3-02 | Stage System impl (StageData SO, StageRegistry, StageController) | gameplay-programmer | M | StageData SO (wave/enemy defs, difficulty), StageRegistry lookup, StageController.BuildBattleConfig, 3 demo stages, 16 EditMode tests |
 
 ### In Progress
 
@@ -41,7 +42,6 @@ _(empty)_
 
 | ID | Task | Owner | Size | Dependencies | Acceptance Criteria |
 |----|------|-------|------|-------------|---------------------|
-| S3-02 | Stage System impl (StageData SO, StageRegistry, StageController) | gameplay-programmer | M | currency (S3-01), game-flow (S2-09) | StageData SO (enemies, rewards, difficulty), 3 demo stages, StageController loads into CombatManager, 12+ EditMode tests |
 | S3-03 | Rewards System (drop table SO, payout on victory) | gameplay-programmer | S | S3-01, S3-02, combat events | RewardTable SO, stage-indexed, paid to Wallet on CombatManager.Victory, 8+ EditMode tests |
 | S3-05 | Team Composition basic (roster list → 3-slot team → hand off to CombatManager) | gameplay-programmer | M | S2-10 roster, S3-02 stage flow | TeamComposition data class, selection API, integrates into stage launch, 10+ EditMode tests |
 
