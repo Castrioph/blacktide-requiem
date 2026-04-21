@@ -26,7 +26,7 @@ namespace BlacktideRequiem.UI.MainMenu
         private void OnStartBattle()
         {
             if (GameFlowManager.Instance != null)
-                GameFlowManager.Instance.LoadCombat();
+                GameFlowManager.Instance.LoadStageSelect();
         }
     }
 }

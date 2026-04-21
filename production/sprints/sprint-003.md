@@ -48,9 +48,10 @@ _(empty)_
 
 | ID | Task | Owner | Size | Dependencies | Acceptance Criteria |
 |----|------|-------|------|-------------|---------------------|
-| S3-06 | Stage Select UI (UGUI — list 3 stages, difficulty label, Launch button) | ui-programmer | M | S3-02 | Playable MainMenu → StageSelect → Combat → Results loop. Playtested acceptance row required (retro #4) |
-| S3-07 | Team Select UI (UGUI — pick 3 of 3 from demo roster, validate) | ui-programmer | M | S3-05, S3-06 | StageSelect → TeamSelect → Combat flow works. Playtest verified |
+| ~~S3-06~~ | ~~Stage Select UI~~ | ui-programmer | M | S3-02 | ✅ Done — layout, colores, 3 misiones visibles, navegación verificada Coplay |
+| ~~S3-07~~ | ~~Team Select UI~~ | ui-programmer | M | S3-05, S3-06 | ✅ Done — slots, roster Elena/Kael/Mirra, flujo completo verificado Coplay |
 | S3-08 | Document Coplay-down fallback in `CLAUDE.md` (retro action #3) | technical-director | S | — | CLAUDE.md snippet: close editor + batchmode OR request manual playtest when Coplay MCP is down |
+| S3-11 | UI Review & Polish (audit MainMenu + StageSelect + TeamSelect, create visual assets) | team-ui | L | S3-06, S3-07 | All UI screens reviewed with `team-ui` skill; sprites/assets created matching Art Bible; visual direction doc updated; Coplay capture confirms correct look |
 
 ### Backlog — Nice to Have
 

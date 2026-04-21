@@ -7,6 +7,8 @@ namespace BlacktideRequiem.Core.Flow
     public static class SceneRegistry
     {
         public const string MainMenu = "MainMenu";
+        public const string StageSelect = "StageSelect";
+        public const string TeamSelect = "TeamSelect";
         public const string Combat = "CombatDemo";
         public const string Results = "Results";
     }

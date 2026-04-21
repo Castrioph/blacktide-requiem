@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using BlacktideRequiem.Core.Events;
 using BlacktideRequiem.Core.Flow;
+using BlacktideRequiem.Core.Stage;
+using BlacktideRequiem.Core.Team;
 
 namespace BlacktideRequiem.Runtime.Flow
 {
@@ -21,6 +23,12 @@ namespace BlacktideRequiem.Runtime.Flow
 
         /// <summary>Last battle result, available after combat ends.</summary>
         public BattleEndEvent? LastBattleResult { get; private set; }
+
+        /// <summary>Stage selected by the player on StageSelect screen.</summary>
+        public StageData SelectedStage { get; set; }
+
+        /// <summary>Team assembled by the player on TeamSelect screen.</summary>
+        public TeamComposition SelectedTeam { get; set; }
 
         /// <summary>Fired when flow state changes.</summary>
         public event Action<GameFlowState> OnStateChanged;
@@ -59,11 +67,30 @@ namespace BlacktideRequiem.Runtime.Flow
         public void LoadMainMenu()
         {
             LastBattleResult = null;
+            SelectedStage = null;
+            SelectedTeam = null;
             TransitionTo(GameFlowState.MainMenu, SceneRegistry.MainMenu);
         }
 
         /// <summary>
-        /// Transition to Combat scene.
+        /// Transition to StageSelect scene.
+        /// </summary>
+        public void LoadStageSelect()
+        {
+            TransitionTo(GameFlowState.StageSelect, SceneRegistry.StageSelect);
+        }
+
+        /// <summary>
+        /// Transition to TeamSelect scene. Set SelectedStage before calling.
+        /// </summary>
+        public void LoadTeamSelect()
+        {
+            SelectedTeam = null;
+            TransitionTo(GameFlowState.TeamSelect, SceneRegistry.TeamSelect);
+        }
+
+        /// <summary>
+        /// Transition to Combat scene. Set SelectedStage before calling.
         /// </summary>
         public void LoadCombat()
         {

@@ -3,6 +3,8 @@ using UnityEngine;
 using BlacktideRequiem.Core.AI;
 using BlacktideRequiem.Core.Combat;
 using BlacktideRequiem.Core.Data;
+using BlacktideRequiem.Core.Stage;
+using BlacktideRequiem.Runtime.Flow;
 using BlacktideRequiem.UI.Combat;
 
 namespace BlacktideRequiem.Runtime.Combat
@@ -32,7 +34,14 @@ namespace BlacktideRequiem.Runtime.Combat
             _playerInput = new PlayerCombatInput();
             _hud.Bind(_playerInput);
 
-            var config = BuildDemoConfig();
+            var selectedStage = GameFlowManager.Instance?.SelectedStage;
+            var selectedTeam  = GameFlowManager.Instance?.SelectedTeam;
+            var allies = (selectedTeam != null && selectedTeam.IsValid)
+                ? selectedTeam.GetTeam()
+                : GetDefaultAllies();
+            var config = selectedStage != null
+                ? StageController.BuildBattleConfig(selectedStage, allies)
+                : BuildDemoConfig();
 
             var allAllies = new List<CombatantState>();
             foreach (var entry in config.Allies)
@@ -46,6 +55,15 @@ namespace BlacktideRequiem.Runtime.Combat
 
             var enemyAI = new EnemyAI(AIProfileType.Agresivo);
             _runner.StartBattle(config, _playerInput, enemyAI);
+        }
+
+        private IReadOnlyList<CharacterData> GetDefaultAllies()
+        {
+            var allies = new List<CharacterData>(3);
+            if (_elena != null) allies.Add(_elena);
+            if (_kael != null) allies.Add(_kael);
+            if (_mirra != null) allies.Add(_mirra);
+            return allies;
         }
 
         private BattleConfig BuildDemoConfig()

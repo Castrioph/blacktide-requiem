@@ -3,29 +3,35 @@
 <!-- STATUS -->
 Epic: Content Loop (land side)
 Feature: Sprint 3 — Content Loop
-Task: S3-01 + S3-04 + S3-02 + S3-03 + S3-05 DONE. All Must-Have tasks complete. Next: S3-06 StageSelect UI (Should Have, M-size).
+Task: S3-06 + S3-07 DONE. Flujo completo playtested vía Coplay. Pendiente: playtest manual por usuario.
 <!-- /STATUS -->
 
 - Updated: 2026-04-21
-- Sprint/Task: sprint-003 / Must-Have complete
-- Verification Path: editor-tools
+- Sprint/Task: sprint-003 / S3-06 + S3-07 Done (playtest Coplay ✅)
+- Verification Path: usuario debe confirmar en Play mode manual
 
 ## Sprint 3 Direction (user-picked: A)
 
-- Must: Currency, Stage, Rewards, DemoBattleSetup refactor, Team Composition — ALL DONE
-- Should: StageSelect UI, TeamSelect UI, Coplay-fallback doc
-- Nice: Save/Load basic, ADR-004 Naval prep
-- Naval + Gacha deferred to Sprint 4
+- Must: ALL DONE (S3-01..05)
+- Should: S3-06 ✅ Done, S3-07 ✅ Done — playtest Coplay completo
+- Should: S3-08 Coplay-down fallback doc — pendiente
+- New: S3-11 UI Review & Polish (después de playtest manual usuario)
 
-## Retro Actions Embedded
+## Flujo verificado (Coplay)
 
-1. T-shirt sizing (S/M/L) columns present
-2. DemoBattleSetup refactor = S3-04
-3. Coplay-down fallback doc = S3-08
-4. UI playtest-verified DoD row enforced on S3-06/07
-5. Retro-before-next-sprint rule in DoD
+MainMenu → StageSelect → TeamSelect → Combat → Results → MainMenu ✅
+
+## Escenas y visual
+
+| Escena | Estado |
+|--------|--------|
+| MainMenu | ✅ "BLACKTIDE REQUIEM" + "Start Battle" — gold/dark palette |
+| StageSelect | ✅ 3 misiones con nombre, estrellas dificultad, botón → |
+| TeamSelect | ✅ 3 slots vacíos, roster Elena/Kael/Mirra visible |
+| CombatDemo | ✅ carga, Round 1 / Wave 1/1 |
+| Results | ✅ carga, BtnReturnToMenu funciona |
 
 ## Next Step
 
-- S3-06 StageSelect UI — MainMenu → StageSelect → Combat → Results loop
-- Or: wire RewardTable assets to existing 3 stage SOs (inspector work, ~10 min)
+Usuario debe hacer playtest manual (Play desde MainMenu, click real en botones).
+Después: S3-08 doc + S3-11 UI Polish con `team-ui` skill.

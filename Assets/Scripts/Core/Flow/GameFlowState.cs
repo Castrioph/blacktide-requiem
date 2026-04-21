@@ -7,6 +7,8 @@ namespace BlacktideRequiem.Core.Flow
     {
         None,
         MainMenu,
+        StageSelect,
+        TeamSelect,
         Combat,
         Results
     }

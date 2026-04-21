@@ -1,53 +1,30 @@
 using UnityEngine;
-using BlacktideRequiem.UI.Combat;
-using BlacktideRequiem.Runtime.Combat;
+using UnityEditor;
+using BlacktideRequiem.Runtime.Flow;
+using BlacktideRequiem.Core.Data;
+using BlacktideRequiem.Core.Team;
 
-public static class SimulateCombat
+public class SimulateCombat
 {
-    public static string Execute()
+    public static void Execute()
     {
-        if (!Application.isPlaying)
-            return "ERROR: Must be in Play mode";
+        var gfm = Object.FindFirstObjectByType<GameFlowManager>();
+        if (gfm == null) { Debug.LogError("[Sim] GFM not found"); return; }
 
-        var runnerGo = GameObject.Find("CombatSystem");
-        if (runnerGo == null) return "ERROR: CombatSystem GO not found";
+        var c1 = AssetDatabase.LoadAssetAtPath<CharacterData>("Assets/Data/Characters/elena_tempestad.asset");
+        var c2 = AssetDatabase.LoadAssetAtPath<CharacterData>("Assets/Data/Characters/kael_polvora.asset");
+        var c3 = AssetDatabase.LoadAssetAtPath<CharacterData>("Assets/Data/Characters/mirra_mareamadre.asset");
 
-        var runner = runnerGo.GetComponent<CombatRunner>();
-        if (runner == null) return "ERROR: CombatRunner component not found";
+        if (c1 == null || c2 == null || c3 == null)
+        { Debug.LogError("[Sim] Character assets not found"); return; }
 
-        var result = $"Runner found. Manager={runner.Manager != null}. ";
+        var team = new TeamComposition(new[] { c1, c2, c3 });
+        team.SelectCharacter(0, c1);
+        team.SelectCharacter(1, c2);
+        team.SelectCharacter(2, c3);
 
-        if (runner.Manager == null)
-            return result + "Manager is null — battle may not have started";
-
-        var phase = runner.Manager.Phase;
-        result += $"Phase={phase}. ";
-
-        var hudGo = GameObject.Find("CombatUI");
-        var hud = hudGo?.GetComponent<CombatHUDCanvas>();
-        if (hud == null) return result + "ERROR: CombatHUDCanvas not found";
-
-        var field = typeof(CombatHUDCanvas).GetField("_playerInput",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var playerInput = field?.GetValue(hud) as PlayerCombatInput;
-        if (playerInput == null) return result + "ERROR: PlayerCombatInput null";
-
-        result += $"IsWaiting={playerInput.IsWaitingForInput}. ";
-
-        if (!playerInput.IsWaitingForInput)
-            return result + "Not waiting for input — enemy turn or transition";
-
-        // Find first alive enemy
-        BlacktideRequiem.Core.Combat.CombatantState target = null;
-        foreach (var enemy in runner.Manager.Enemies)
-        {
-            if (!enemy.IsKO) { target = enemy; break; }
-        }
-        if (target == null) return result + "No alive enemies";
-
-        var hpBefore = target.CurrentHP;
-        playerInput.SubmitAttack(target);
-
-        return result + $"Attacked {target.Template.DisplayName}! HP: {hpBefore} -> {target.CurrentHP}";
+        gfm.SelectedTeam = team;
+        Debug.Log($"[Sim] Team set, loading Combat");
+        gfm.LoadCombat();
     }
 }

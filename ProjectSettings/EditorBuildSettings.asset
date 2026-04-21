@@ -6,14 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
-    guid: 809f0b85237054c4f983a6dad87fa3d0
+    path: Assets/MainMenu.unity
+    guid: f64e8e099a09e484b91b404f32129389
+  - enabled: 1
+    path: Assets/StageSelect.unity
+    guid: e5624e02527a03443916b968fe73c52e
+  - enabled: 1
+    path: Assets/TeamSelect.unity
+    guid: ee8611741a80b3b4eb8d9ecb3bfd7cb6
   - enabled: 1
     path: Assets/Scenes/CombatDemo.unity
-    guid: 95a799a2a2b55d14590bf5b0c43d25f3
+    guid: 977671bdf5e87a34fb3cf3dfd4bd41a7
   - enabled: 1
     path: Assets/Scenes/Results.unity
-    guid: fdcf3ea8860bd144f912f4a9513a07bb
+    guid: 63d1bfa6d29bdc046a5a5e1e6438e51f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
