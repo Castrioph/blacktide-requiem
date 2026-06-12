@@ -36,6 +36,16 @@ easy to verify.
 - Combat architecture: `docs/architecture/adr-003-combat-architecture.md`
 - **Coplay + Unity UI lessons (LEER antes de cualquier tarea UI):** `.claude/docs/coplay-unity-lessons.md`
 
+## Coplay Fallback (cuando Coplay MCP está caído)
+
+Si `check_compile_errors` u otras herramientas Coplay fallan con error de conexión:
+
+1. **Opción A — batchmode**: `Unity.exe -batchmode -projectPath . -executeMethod <EditorScript> -quit -logFile -`
+2. **Opción B — pedir playtest manual**: Indicar al usuario los pasos exactos en Play mode (escena, botones, resultado esperado).
+3. **No bloquear la sesión**: Documentar el estado en `active.md` como "pendiente verificación manual" y continuar con tareas que no requieran editor.
+
+Criterio de elección: si el Editor ya está abierto → pedir manual. Si no → intentar batchmode. Si batchmode falla → pedir manual.
+
 ## Deep References
 
 Use only when relevant to the current task:
