@@ -69,11 +69,12 @@ namespace BlacktideRequiem.Tests.EditMode
         private static CombatContext MakeContext(CombatantState actor,
             List<CombatantState> allies, List<CombatantState> enemies)
         {
+            // CombatContext carries ICombatant since S4-04 (ADR-004)
             return new CombatContext
             {
                 Actor = actor,
-                Allies = allies,
-                Enemies = enemies
+                Allies = new List<ICombatant>(allies),
+                Enemies = new List<ICombatant>(enemies)
             };
         }
 

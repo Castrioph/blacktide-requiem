@@ -123,18 +123,19 @@ namespace BlacktideRequiem.Core.Combat
 
         private void ResolveOffensiveAction(CombatantState actor, CombatAction action)
         {
+            // Land battles only ever target CombatantState combatants.
             switch (action.TargetType)
             {
                 case TargetType.AoeEnemy:
                     var enemyTargets = _manager.GetAliveWaveEnemies();
                     foreach (var target in enemyTargets)
-                        ResolveSingleTarget(actor, target, action);
+                        ResolveSingleTarget(actor, (CombatantState)target, action);
                     break;
 
                 case TargetType.AllyAoe:
                     var allyTargets = _manager.GetAliveAllies();
                     foreach (var target in allyTargets)
-                        ResolveHealOrBuff(actor, target, action);
+                        ResolveHealOrBuff(actor, (CombatantState)target, action);
                     break;
 
                 case TargetType.Self:
@@ -143,13 +144,13 @@ namespace BlacktideRequiem.Core.Combat
 
                 case TargetType.SingleAlly:
                     if (action.Target != null)
-                        ResolveHealOrBuff(actor, action.Target, action);
+                        ResolveHealOrBuff(actor, (CombatantState)action.Target, action);
                     break;
 
                 case TargetType.SingleEnemy:
                 default:
                     if (action.Target != null)
-                        ResolveSingleTarget(actor, action.Target, action);
+                        ResolveSingleTarget(actor, (CombatantState)action.Target, action);
                     break;
             }
         }

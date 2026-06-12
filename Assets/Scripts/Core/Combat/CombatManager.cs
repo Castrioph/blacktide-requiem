@@ -36,14 +36,14 @@ namespace BlacktideRequiem.Core.Combat
         private BattleConfig _config;
 
         // --- Combatant Lists ---
-        private readonly List<CombatantState> _allies = new();
-        private readonly List<CombatantState> _enemies = new();
+        private readonly List<ICombatant> _allies = new();
+        private readonly List<ICombatant> _enemies = new();
         private readonly List<InitiativeEntry> _allEntries = new();
         private List<InitiativeEntry> _allyEntries = new();
         private List<InitiativeEntry> _currentWaveEnemyEntries = new();
 
-        public IReadOnlyList<CombatantState> Allies => _allies;
-        public IReadOnlyList<CombatantState> Enemies => _enemies;
+        public IReadOnlyList<ICombatant> Allies => _allies;
+        public IReadOnlyList<ICombatant> Enemies => _enemies;
 
         // --- Synergy State ---
         private List<ActiveSynergy> _allySynergiesPrimary = new();
@@ -93,7 +93,7 @@ namespace BlacktideRequiem.Core.Combat
             _allyEntries = new List<InitiativeEntry>(config.Allies);
             _allies.Clear();
             foreach (var entry in _allyEntries)
-                _allies.Add((CombatantState)entry.Combatant); // land config — S4-04 generalizes lists/events to ICombatant
+                _allies.Add(entry.Combatant);
 
             // Store captain config
             _captainIndex = config.CaptainIndex;
@@ -161,9 +161,8 @@ namespace BlacktideRequiem.Core.Combat
 
                 CurrentActor = entry;
                 var combatant = entry.Combatant;
-                var unit = combatant as CombatantState; // for CombatantState-typed events — S4-04 generalizes
 
-                GameEvents.PublishTurnStart(unit);
+                GameEvents.PublishTurnStart(combatant);
 
                 // Step 1: Tick buffs/debuffs, status durations, and cooldowns
                 combatant.Buffs.TickTurns();
@@ -172,7 +171,7 @@ namespace BlacktideRequiem.Core.Combat
                 {
                     GameEvents.PublishStatusRemoved(new StatusRemovedEvent
                     {
-                        Target = unit,
+                        Target = combatant,
                         Effect = effect,
                         Reason = StatusRemovalReason.Expired
                     });
@@ -187,7 +186,7 @@ namespace BlacktideRequiem.Core.Combat
                 _resolver.ApplyStartOfTurnDoTs(combatant);
                 if (combatant.IsKO)
                 {
-                    HandleDeath(unit);
+                    HandleDeath(combatant);
                     _bar.CompleteCurrentTurn();
                     if (Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat)
                         return null;
@@ -200,7 +199,7 @@ namespace BlacktideRequiem.Core.Combat
                     var ccEffect = GetActiveCC(combatant);
                     GameEvents.PublishTurnSkipped(new TurnSkippedEvent
                     {
-                        Combatant = unit,
+                        Combatant = combatant,
                         Reason = ccEffect
                     });
 
@@ -215,7 +214,7 @@ namespace BlacktideRequiem.Core.Combat
                     _resolver.OnTurnStart(combatant);
 
                     _bar.CompleteCurrentTurn();
-                    GameEvents.PublishTurnEnd(unit);
+                    GameEvents.PublishTurnEnd(combatant);
 
                     if (Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat)
                         return null;
@@ -258,7 +257,7 @@ namespace BlacktideRequiem.Core.Combat
         {
             if (CurrentActor != null)
             {
-                GameEvents.PublishTurnEnd(CurrentActor.Combatant as CombatantState);
+                GameEvents.PublishTurnEnd(CurrentActor.Combatant);
                 _bar.CompleteCurrentTurn();
             }
             CurrentActor = null;
@@ -293,7 +292,7 @@ namespace BlacktideRequiem.Core.Combat
             bool isAlly = CurrentActor?.Team == CombatTeam.Ally;
             return new CombatContext
             {
-                Actor = CurrentActor?.Combatant as CombatantState,
+                Actor = CurrentActor?.Combatant,
                 Allies = isAlly ? GetAlive(_allyEntries) : GetAlive(_currentWaveEnemyEntries),
                 Enemies = isAlly ? GetAlive(_currentWaveEnemyEntries) : GetAlive(_allyEntries)
             };
@@ -304,24 +303,25 @@ namespace BlacktideRequiem.Core.Combat
         // ====================================================================
 
         /// <summary>Living allies. Used by resolvers for ally-AoE targeting.</summary>
-        internal List<CombatantState> GetAliveAllies() => GetAlive(_allyEntries);
+        internal List<ICombatant> GetAliveAllies() => GetAlive(_allyEntries);
 
         /// <summary>Living enemies of the current wave. Used by resolvers for enemy-AoE targeting.</summary>
-        internal List<CombatantState> GetAliveWaveEnemies() => GetAlive(_currentWaveEnemyEntries);
+        internal List<ICombatant> GetAliveWaveEnemies() => GetAlive(_currentWaveEnemyEntries);
 
         /// <summary>Notifies the manager that a resolver killed a combatant.</summary>
-        internal void NotifyDeath(CombatantState combatant) => HandleDeath(combatant);
+        internal void NotifyDeath(ICombatant combatant) => HandleDeath(combatant);
 
         // ====================================================================
         // DEATH & BATTLE END
         // ====================================================================
 
-        private void HandleDeath(CombatantState combatant)
+        private void HandleDeath(ICombatant combatant)
         {
             GameEvents.PublishUnitDied(combatant);
             _bar.RemoveDead(combatant);
 
-            combatant.IsGuarding = false;
+            if (combatant is CombatantState unit)
+                unit.IsGuarding = false;
 
             // Synergy re-evaluation on captain KO (GDD §2, §4)
             CheckCaptainKO(combatant);
@@ -380,7 +380,7 @@ namespace BlacktideRequiem.Core.Combat
             _currentWaveEnemyEntries = new List<InitiativeEntry>(_config.Waves[index].Enemies);
             _enemies.Clear();
             foreach (var entry in _currentWaveEnemyEntries)
-                _enemies.Add((CombatantState)entry.Combatant); // land config — S4-04 generalizes lists/events to ICombatant
+                _enemies.Add(entry.Combatant);
 
             // Evaluate enemy synergies for this wave
             int enemyCaptainIdx = _config.Waves[index].EnemyCaptainIndex;
@@ -461,7 +461,7 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>
         /// Checks if a dying combatant is a captain and deactivates synergies.
         /// </summary>
-        private void CheckCaptainKO(CombatantState combatant)
+        private void CheckCaptainKO(ICombatant combatant)
         {
             // Allied primary captain KO
             if (_captainIndex >= 0 && _captainIndex < _allies.Count
@@ -504,9 +504,9 @@ namespace BlacktideRequiem.Core.Combat
         public void OnCaptainRevived(CombatantState combatant)
         {
             bool isPrimaryCaptain = _captainIndex >= 0 && _captainIndex < _allies.Count
-                && _allies[_captainIndex] == combatant;
+                && ReferenceEquals(_allies[_captainIndex], combatant);
             bool isSecondaryCaptain = _isGuestFriend && _allies.Count > 1
-                && _allies[_allies.Count - 1] == combatant;
+                && ReferenceEquals(_allies[_allies.Count - 1], combatant);
 
             if (isPrimaryCaptain || isSecondaryCaptain)
                 ReEvaluateAllySynergies();
@@ -538,12 +538,12 @@ namespace BlacktideRequiem.Core.Combat
         // UTILITY
         // ====================================================================
 
-        private List<CombatantState> GetAlive(List<InitiativeEntry> entries)
+        private List<ICombatant> GetAlive(List<InitiativeEntry> entries)
         {
-            var result = new List<CombatantState>();
+            var result = new List<ICombatant>();
             foreach (var e in entries)
                 if (!e.Combatant.IsKO)
-                    result.Add((CombatantState)e.Combatant); // land config — S4-04 generalizes
+                    result.Add(e.Combatant);
             return result;
         }
     }

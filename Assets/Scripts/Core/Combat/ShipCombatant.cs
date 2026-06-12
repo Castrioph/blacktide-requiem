@@ -37,6 +37,7 @@ namespace BlacktideRequiem.Core.Combat
         public bool IsKO => CurrentHHP <= 0;
         public bool IsBoss { get; set; }
         public Element Element => Ship.Element;
+        public string DisplayName => Ship != null ? Ship.DisplayName : null;
 
         // --- ICombatant HP surface (maps to hull) ---
         int ICombatant.CurrentHP => CurrentHHP;

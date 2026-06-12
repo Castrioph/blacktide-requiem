@@ -81,8 +81,8 @@ namespace BlacktideRequiem.UI.Combat
         public List<AbilityData> GetAvailableAbilities()
         {
             var result = new List<AbilityData>();
-            var actor = _currentContext.Actor;
-            if (actor == null) return result;
+            // Land input: the actor is always a land unit (naval input is S4-06).
+            if (_currentContext.Actor is not CombatantState actor) return result;
 
             bool silenced = actor.HasStatus(StatusEffect.Silencio);
             if (silenced) return result;

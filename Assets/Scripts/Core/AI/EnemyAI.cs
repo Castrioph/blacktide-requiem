@@ -41,6 +41,10 @@ namespace BlacktideRequiem.Core.AI
             callback(action);
         }
 
+        /// <summary>Land AI: the actor is always a land unit (naval AI is S4-05).</summary>
+        private static CombatantState Actor(CombatContext context)
+            => (CombatantState)context.Actor;
+
         // ====================================================================
         // AGRESIVO — lowest HP target, highest damage ability
         // ====================================================================
@@ -50,11 +54,11 @@ namespace BlacktideRequiem.Core.AI
             var target = FindLowestHP(context.Enemies);
             if (target == null) return CombatAction.PassTurn();
 
-            var ability = FindHighestDamageAbility(context.Actor);
+            var ability = FindHighestDamageAbility(Actor(context));
             if (ability != null)
                 return CombatAction.FromAbility(ability, target);
 
-            return CombatAction.BasicAttack(target, IsPhysicalAttacker(context.Actor));
+            return CombatAction.BasicAttack(target, IsPhysicalAttacker(Actor(context)));
         }
 
         // ====================================================================
@@ -63,7 +67,7 @@ namespace BlacktideRequiem.Core.AI
 
         private CombatAction DecideDefensivo(CombatContext context)
         {
-            var actor = context.Actor;
+            var actor = Actor(context);
 
             // If no buffs active, try to use a buff/defensive ability
             if (actor.Buffs.All.Count == 0)
@@ -100,7 +104,7 @@ namespace BlacktideRequiem.Core.AI
             if (context.Enemies.Count == 0) return CombatAction.PassTurn();
 
             var target = context.Enemies[UnityEngine.Random.Range(0, context.Enemies.Count)];
-            var abilities = GetAvailableAbilities(context.Actor);
+            var abilities = GetAvailableAbilities(Actor(context));
 
             if (abilities.Count > 0)
             {
@@ -108,7 +112,7 @@ namespace BlacktideRequiem.Core.AI
                 return CombatAction.FromAbility(ability, target);
             }
 
-            return CombatAction.BasicAttack(target, IsPhysicalAttacker(context.Actor));
+            return CombatAction.BasicAttack(target, IsPhysicalAttacker(Actor(context)));
         }
 
         // ====================================================================
@@ -116,11 +120,11 @@ namespace BlacktideRequiem.Core.AI
         // ====================================================================
 
         /// <summary>Finds the combatant with the lowest current HP.</summary>
-        private static CombatantState FindLowestHP(List<CombatantState> combatants)
+        private static ICombatant FindLowestHP(List<ICombatant> combatants)
         {
             if (combatants == null || combatants.Count == 0) return null;
 
-            CombatantState lowest = combatants[0];
+            ICombatant lowest = combatants[0];
             for (int i = 1; i < combatants.Count; i++)
             {
                 if (combatants[i].CurrentHP < lowest.CurrentHP)

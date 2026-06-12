@@ -53,6 +53,9 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>Element from the data template (Neutral if no template).</summary>
         public Element Element => Template != null ? Template.Element : Element.Neutral;
 
+        /// <summary>Display name from the data template (ICombatant).</summary>
+        public string DisplayName => Template != null ? Template.DisplayName : null;
+
         /// <summary>Land units have no inherent status immunities (bosses' Muerte immunity is handled via IsBoss).</summary>
         public bool IsImmuneTo(StatusEffect effect) => false;
 

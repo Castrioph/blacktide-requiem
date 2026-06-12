@@ -367,8 +367,10 @@ namespace BlacktideRequiem.UI.Combat
             RefreshInitiativeBar(null);
         }
 
-        private void HandleTurnStart(CombatantState combatant)
+        private void HandleTurnStart(ICombatant actor)
         {
+            // Land HUD — naval combat uses its own HUD (S4-06).
+            if (actor is not CombatantState combatant) return;
             UpdateUnitInfo(combatant);
             UpdateAllCombatantCards();
             HighlightActiveUnit(combatant);
@@ -389,17 +391,17 @@ namespace BlacktideRequiem.UI.Combat
             SetState(UIState.ActionSelect);
         }
 
-        private void HandleTurnEnd(CombatantState combatant)
+        private void HandleTurnEnd(ICombatant combatant)
         {
             UpdateAllCombatantCards();
         }
 
         private void HandleActionChosen(CombatAction action)
         {
-            string actorName = _playerInput?.CurrentContext.Actor?.Template?.DisplayName ?? "???";
+            string actorName = _playerInput?.CurrentContext.Actor?.DisplayName ?? "???";
             string msg = action.Type switch
             {
-                ActionType.Attack => $"{actorName} attacks {action.Target?.Template?.DisplayName}!",
+                ActionType.Attack => $"{actorName} attacks {action.Target?.DisplayName}!",
                 ActionType.Ability => $"{actorName} uses {action.ActionName}!",
                 ActionType.Guard => $"{actorName} guards!",
                 ActionType.Pass => $"{actorName} passes.",
@@ -410,7 +412,7 @@ namespace BlacktideRequiem.UI.Combat
 
         private void HandleDamageDealt(DamageEvent e)
         {
-            string targetName = e.Target?.Template?.DisplayName ?? "???";
+            string targetName = e.Target?.DisplayName ?? "???";
 
             if (e.Result.IsMiss)
             {
@@ -437,21 +439,21 @@ namespace BlacktideRequiem.UI.Combat
 
         private void HandleHealApplied(HealEvent e)
         {
-            string targetName = e.Target?.Template?.DisplayName ?? "???";
+            string targetName = e.Target?.DisplayName ?? "???";
             AddLogEntry($"{targetName} healed for {e.Amount} HP", LOG_HEAL);
             UpdateAllCombatantCards();
         }
 
         private void HandleTurnSkipped(TurnSkippedEvent e)
         {
-            string name = e.Combatant?.Template?.DisplayName ?? "???";
+            string name = e.Combatant?.DisplayName ?? "???";
             string reason = e.Reason == StatusEffect.Aturdimiento ? "Stunned" : "Asleep";
             AddLogEntry($"{name} is {reason}! Turn skipped.", LOG_STATUS);
         }
 
-        private void HandleUnitDied(CombatantState combatant)
+        private void HandleUnitDied(ICombatant combatant)
         {
-            string name = combatant?.Template?.DisplayName ?? "???";
+            string name = combatant?.DisplayName ?? "???";
             AddLogEntry($"{name} has been defeated!", LOG_DAMAGE);
             UpdateAllCombatantCards();
         }
@@ -507,7 +509,7 @@ namespace BlacktideRequiem.UI.Combat
 
         private void HandleStatusApplied(StatusAppliedEvent e)
         {
-            string targetName = e.Target?.Template?.DisplayName ?? "???";
+            string targetName = e.Target?.DisplayName ?? "???";
             AddLogEntry($"{targetName} afflicted with {e.Status.Effect}!", LOG_STATUS);
         }
 
@@ -551,7 +553,8 @@ namespace BlacktideRequiem.UI.Combat
 
             ClearChildren(_enemyColumn);
             foreach (var enemy in runner.Manager.Enemies)
-                CreateCombatantCard(enemy, false, _enemyColumn);
+                if (enemy is CombatantState unit) // land HUD: units only
+                    CreateCombatantCard(unit, false, _enemyColumn);
         }
 
         private void CreateCombatantCard(CombatantState combatant, bool isAlly, Transform parent)
@@ -664,7 +667,8 @@ namespace BlacktideRequiem.UI.Combat
             foreach (var target in targets)
             {
                 if (target.IsKO) continue;
-                if (_combatantCards.TryGetValue(target, out var card))
+                if (target is not CombatantState unit) continue; // land HUD: units only
+                if (_combatantCards.TryGetValue(unit, out var card))
                 {
                     var outline = card.GetComponent<Outline>() ?? card.AddComponent<Outline>();
                     outline.effectColor = TARGETABLE_COLOR;

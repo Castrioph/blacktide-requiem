@@ -17,11 +17,19 @@ namespace BlacktideRequiem.Core.Combat
         bool IsKO { get; }
         bool IsBoss { get; }
 
+        /// <summary>Display name for UI/logs (unit template name or ship name).</summary>
+        string DisplayName { get; }
+
         // HP surface (ship maps these to hull HP/HHP) — shared by UI and DoTs
         int CurrentHP { get; }
         int MaxHP { get; }
         int ApplyDamage(int damage);
         int ApplyHealing(int amount);
+
+        // MP resource (shared by land abilities and naval abilities/Repair)
+        int CurrentMP { get; }
+        int MaxMP { get; }
+        void ConsumeMP(int amount);
 
         // Initiative + shared pipeline
         float GetEffectiveStat(StatType stat);

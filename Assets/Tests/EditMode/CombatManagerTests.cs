@@ -587,7 +587,7 @@ namespace BlacktideRequiem.Tests.EditMode
             _manager.TransitionToNextWave();
             Assert.AreEqual(1, _manager.WaveIndex);
             Assert.AreEqual(1, _manager.Enemies.Count);
-            Assert.AreEqual("enemy_w2", _manager.Enemies[0].Template.Id);
+            Assert.AreEqual("enemy_w2", ((CombatantState)_manager.Enemies[0]).Template.Id);
         }
 
         [Test]
@@ -663,7 +663,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             Assert.AreEqual(2, ctx.Allies.Count);
             Assert.AreEqual(1, ctx.Enemies.Count);
-            Assert.AreEqual("enemy2", ctx.Enemies[0].Template.Id);
+            Assert.AreEqual("enemy2", ((CombatantState)ctx.Enemies[0]).Template.Id);
         }
 
         // ====================================================================
@@ -678,7 +678,7 @@ namespace BlacktideRequiem.Tests.EditMode
             _manager.BeginRound();
 
             CombatantState turnStartUnit = null;
-            GameEvents.OnTurnStart += c => turnStartUnit = c;
+            GameEvents.OnTurnStart += c => turnStartUnit = (CombatantState)c;
 
             _manager.AdvanceTurn();
 
@@ -697,7 +697,7 @@ namespace BlacktideRequiem.Tests.EditMode
             );
 
             CombatantState diedUnit = null;
-            GameEvents.OnUnitDied += c => diedUnit = c;
+            GameEvents.OnUnitDied += c => diedUnit = (CombatantState)c;
 
             _manager.StartBattle(config);
             _manager.BeginRound();
