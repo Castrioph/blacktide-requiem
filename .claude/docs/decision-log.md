@@ -13,6 +13,10 @@
   still an option for later menu work, but not the active combat HUD path.
 - Prototype combat code is reference only; production behavior belongs in
   `Assets/Scripts/Core/`.
+- Naval combat reuses land orchestration by composition: single
+  `CombatManager` + `InitiativeBar` over an `ICombatant` interface; ship = one
+  combatant, crew = passive sub-entities (no turns); naval divergence isolated
+  in `ITurnResolver`. See `docs/architecture/adr-004-naval-combat-architecture.md`.
 
 ## Current Direction
 
