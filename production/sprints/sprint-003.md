@@ -1,6 +1,6 @@
 # Sprint 3 — Content Loop: Stage, Currency, Rewards, Team Composition
 
-> **Status**: Proposed
+> **Status**: Completed (2026-06-12) — retro: sprint-003-retrospective.md
 > **Method**: Kanban (WIP=1) + lightweight T-shirt sizing (S/M/L)
 > **Created**: 2026-04-20
 > **Kickoff**: 2026-04-21 (pending user approval)

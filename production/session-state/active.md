@@ -3,7 +3,7 @@
 <!-- STATUS -->
 Epic: Content Loop (land side)
 Feature: Sprint 3 — Content Loop
-Task: S3-11 implementado + verificado Coplay. Pendiente: playtest manual usuario + commit.
+Task: Sprint 3 CERRADO (S3-11 Done, commits pushed, retro escrita). Siguiente: S4 planning — ADR-004 Naval primero.
 <!-- /STATUS -->
 
 - Updated: 2026-06-12
@@ -32,7 +32,9 @@ MainMenu → StageSelect → TeamSelect → Combat → Results → MainMenu ✅
 - RewardTables creadas (Assets/Data/Rewards/, 50/80/120 Doblones) y cableadas a stages — cards muestran botín real
 - Gap aceptado: D-pad explícito por listas (P2-10) — focus inicial por código
 
-## Pendiente
+## Sprint 3 cerrado (2026-06-12)
 
-- Playtest manual usuario (DoD retro #4) antes de marcar S3-11 Done
-- Commit (pedir permiso usuario, Conventional Commits)
+- Commits `4b358c3` (S3-08) + `31d6d06` (S3-11) pushed a origin/main
+- Retro: production/sprints/sprint-003-retrospective.md — 100% Must+Should
+- Carryover a S4: S3-09 Save/Load (decidir post-gacha), S3-10 ADR-004 (1ª tarea S4)
+- Acción clave S4: acceptance data-driven = "assets cableados y visibles en juego"
