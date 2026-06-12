@@ -45,11 +45,11 @@ namespace BlacktideRequiem.Runtime.Combat
 
             var allAllies = new List<CombatantState>();
             foreach (var entry in config.Allies)
-                allAllies.Add(entry.Combatant);
+                allAllies.Add((CombatantState)entry.Combatant);
 
             var firstWaveEnemies = new List<CombatantState>();
             foreach (var entry in config.Waves[0].Enemies)
-                firstWaveEnemies.Add(entry.Combatant);
+                firstWaveEnemies.Add((CombatantState)entry.Combatant);
 
             _hud.BuildCombatantCards(allAllies, firstWaveEnemies, config.Waves.Count);
 

@@ -7,13 +7,14 @@ using BlacktideRequiem.Core.Events;
 namespace BlacktideRequiem.Core.Combat
 {
     /// <summary>
-    /// Orchestrates the land combat state machine and turn processing pipeline.
+    /// Orchestrates the combat state machine and turn processing pipeline.
     /// Pure C# class — no MonoBehaviour. Driven by CombatRunner (coroutine wrapper).
+    /// Action-phase semantics (land vs naval) are delegated to an ITurnResolver.
     ///
     /// Battle flow: PreCombat → InRound ⇄ WaveTransition → Victory/Defeat
-    /// Turn order: buff tick → CC immunity → bleed → CC check → action → burn → poison
+    /// Turn order: buff tick → CC immunity → start DoTs → CC check → action → post DoTs
     ///
-    /// See Combate Terrestre GDD and ADR-003.
+    /// See Combate Terrestre GDD, ADR-003 and ADR-004.
     /// </summary>
     public class CombatManager
     {
@@ -31,6 +32,7 @@ namespace BlacktideRequiem.Core.Combat
         // --- Dependencies ---
         public InitiativeBar Bar => _bar;
         private readonly InitiativeBar _bar;
+        private readonly ITurnResolver _resolver;
         private BattleConfig _config;
 
         // --- Combatant Lists ---
@@ -64,12 +66,15 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>Currently active enemy synergies.</summary>
         public IReadOnlyList<ActiveSynergy> EnemySynergies => _enemySynergies;
 
-        // --- Last action tracking (for tests and LB evaluation) ---
-        private bool _lastActionWasPass;
-
-        public CombatManager(InitiativeBar bar)
+        /// <summary>
+        /// Creates a manager. Defaults to land combat semantics; pass a
+        /// NavalTurnResolver for naval battles (ADR-004 §3).
+        /// </summary>
+        public CombatManager(InitiativeBar bar, ITurnResolver resolver = null)
         {
             _bar = bar ?? throw new ArgumentNullException(nameof(bar));
+            _resolver = resolver ?? new LandTurnResolver();
+            _resolver.Initialize(this);
         }
 
         // ====================================================================
@@ -88,7 +93,7 @@ namespace BlacktideRequiem.Core.Combat
             _allyEntries = new List<InitiativeEntry>(config.Allies);
             _allies.Clear();
             foreach (var entry in _allyEntries)
-                _allies.Add(entry.Combatant);
+                _allies.Add((CombatantState)entry.Combatant); // land config — S4-04 generalizes lists/events to ICombatant
 
             // Store captain config
             _captainIndex = config.CaptainIndex;
@@ -156,8 +161,9 @@ namespace BlacktideRequiem.Core.Combat
 
                 CurrentActor = entry;
                 var combatant = entry.Combatant;
+                var unit = combatant as CombatantState; // for CombatantState-typed events — S4-04 generalizes
 
-                GameEvents.PublishTurnStart(combatant);
+                GameEvents.PublishTurnStart(unit);
 
                 // Step 1: Tick buffs/debuffs, status durations, and cooldowns
                 combatant.Buffs.TickTurns();
@@ -166,7 +172,7 @@ namespace BlacktideRequiem.Core.Combat
                 {
                     GameEvents.PublishStatusRemoved(new StatusRemovedEvent
                     {
-                        Target = combatant,
+                        Target = unit,
                         Effect = effect,
                         Reason = StatusRemovalReason.Expired
                     });
@@ -177,27 +183,15 @@ namespace BlacktideRequiem.Core.Combat
                 if (combatant.CCImmunityTurns > 0)
                     combatant.CCImmunityTurns--;
 
-                // Step 3: Bleed damage (Sangrado)
-                if (combatant.HasStatus(StatusEffect.Sangrado))
+                // Step 3: Start-of-turn DoTs (Sangrado) — domain-specific (resolver)
+                _resolver.ApplyStartOfTurnDoTs(combatant);
+                if (combatant.IsKO)
                 {
-                    int bleedDamage = CalculateDoTDamage(combatant, StatusEffect.Sangrado);
-                    int actual = combatant.ApplyDamage(bleedDamage);
-                    GameEvents.PublishDamageDealt(new DamageEvent
-                    {
-                        Source = null,
-                        Target = combatant,
-                        ActualDamage = actual,
-                        DamageSource = DamageSource.Bleed
-                    });
-
-                    if (combatant.IsKO)
-                    {
-                        HandleDeath(combatant);
-                        _bar.CompleteCurrentTurn();
-                        if (Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat)
-                            return null;
-                        continue;
-                    }
+                    HandleDeath(unit);
+                    _bar.CompleteCurrentTurn();
+                    if (Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat)
+                        return null;
+                    continue;
                 }
 
                 // Step 4: CC check
@@ -206,7 +200,7 @@ namespace BlacktideRequiem.Core.Combat
                     var ccEffect = GetActiveCC(combatant);
                     GameEvents.PublishTurnSkipped(new TurnSkippedEvent
                     {
-                        Combatant = combatant,
+                        Combatant = unit,
                         Reason = ccEffect
                     });
 
@@ -217,19 +211,19 @@ namespace BlacktideRequiem.Core.Combat
                         combatant.CCImmunityTurns = InitiativeBar.CC_IMMUNITY_DURATION;
                     }
 
-                    // Remove guard at start of turn (GDD: guard removed at start of turn)
-                    combatant.IsGuarding = false;
+                    // Domain-specific upkeep (land: guard removal)
+                    _resolver.OnTurnStart(combatant);
 
                     _bar.CompleteCurrentTurn();
-                    GameEvents.PublishTurnEnd(combatant);
+                    GameEvents.PublishTurnEnd(unit);
 
                     if (Phase == BattlePhase.Victory || Phase == BattlePhase.Defeat)
                         return null;
                     continue;
                 }
 
-                // Remove guard at start of turn (GDD §3: removed before acting)
-                combatant.IsGuarding = false;
+                // Domain-specific upkeep before acting (land: guard removal, GDD §3)
+                _resolver.OnTurnStart(combatant);
 
                 // Ready for action — return to caller
                 return entry;
@@ -237,81 +231,23 @@ namespace BlacktideRequiem.Core.Combat
         }
 
         /// <summary>
-        /// Resolves a chosen action for the current actor.
-        /// Handles damage, guard, pass, post-action DoTs, death, and LB.
+        /// Resolves a chosen action for the current actor via the turn resolver.
+        /// Handles post-action DoT scheduling; death and LB flow through events.
         /// </summary>
         public void ResolveAction(CombatAction action)
         {
             var actor = CurrentActor.Combatant;
-            _lastActionWasPass = false;
 
             GameEvents.PublishActionChosen(action);
 
-            switch (action.Type)
-            {
-                case ActionType.Guard:
-                    actor.IsGuarding = true;
-                    GameEvents.PublishGuardActivated(actor);
-                    break;
-
-                case ActionType.Pass:
-                    _lastActionWasPass = true;
-                    break;
-
-                case ActionType.Attack:
-                    ResolveOffensiveAction(actor, action);
-                    break;
-
-                case ActionType.Ability:
-                    if (action.AbilityData != null)
-                    {
-                        actor.ConsumeMP(action.AbilityData.MPCost);
-                    }
-                    ResolveOffensiveAction(actor, action);
-                    if (action.AbilityData != null)
-                    {
-                        actor.ActivateCooldown(action.AbilityData);
-                    }
-                    break;
-            }
+            _resolver.ResolveAction(actor, action, GetCurrentContext());
 
             // Post-action DoTs (only if actor alive; also process during Victory
             // so simultaneous death → Defeat can override — GDD edge case 1)
+            bool actorPassed = action.Type == ActionType.Pass;
             if (!actor.IsKO && (Phase == BattlePhase.InRound || Phase == BattlePhase.Victory))
             {
-                // Step 6: Burn (only if acted — not if Passed) (GDD §2)
-                if (!_lastActionWasPass && actor.HasStatus(StatusEffect.Quemadura))
-                {
-                    int burnDamage = CalculateDoTDamage(actor, StatusEffect.Quemadura);
-                    int actual = actor.ApplyDamage(burnDamage);
-                    GameEvents.PublishDamageDealt(new DamageEvent
-                    {
-                        Source = null,
-                        Target = actor,
-                        ActualDamage = actual,
-                        DamageSource = DamageSource.Burn
-                    });
-
-                    if (actor.IsKO)
-                        HandleDeath(actor);
-                }
-
-                // Step 7: Poison
-                if (!actor.IsKO && actor.HasStatus(StatusEffect.Veneno))
-                {
-                    int poisonDamage = CalculateDoTDamage(actor, StatusEffect.Veneno);
-                    int actual = actor.ApplyDamage(poisonDamage);
-                    GameEvents.PublishDamageDealt(new DamageEvent
-                    {
-                        Source = null,
-                        Target = actor,
-                        ActualDamage = actual,
-                        DamageSource = DamageSource.Poison
-                    });
-
-                    if (actor.IsKO)
-                        HandleDeath(actor);
-                }
+                _resolver.ApplyPostActionDoTs(actor, actorPassed);
             }
         }
 
@@ -322,7 +258,7 @@ namespace BlacktideRequiem.Core.Combat
         {
             if (CurrentActor != null)
             {
-                GameEvents.PublishTurnEnd(CurrentActor.Combatant);
+                GameEvents.PublishTurnEnd(CurrentActor.Combatant as CombatantState);
                 _bar.CompleteCurrentTurn();
             }
             CurrentActor = null;
@@ -357,200 +293,24 @@ namespace BlacktideRequiem.Core.Combat
             bool isAlly = CurrentActor?.Team == CombatTeam.Ally;
             return new CombatContext
             {
-                Actor = CurrentActor?.Combatant,
+                Actor = CurrentActor?.Combatant as CombatantState,
                 Allies = isAlly ? GetAlive(_allyEntries) : GetAlive(_currentWaveEnemyEntries),
                 Enemies = isAlly ? GetAlive(_currentWaveEnemyEntries) : GetAlive(_allyEntries)
             };
         }
 
         // ====================================================================
-        // ACTION RESOLUTION
+        // RESOLVER SUPPORT (internal surface for ITurnResolver implementations)
         // ====================================================================
 
-        private void ResolveOffensiveAction(CombatantState actor, CombatAction action)
-        {
-            switch (action.TargetType)
-            {
-                case TargetType.AoeEnemy:
-                    var enemyTargets = GetAlive(_currentWaveEnemyEntries);
-                    foreach (var target in enemyTargets)
-                        ResolveSingleTarget(actor, target, action);
-                    break;
+        /// <summary>Living allies. Used by resolvers for ally-AoE targeting.</summary>
+        internal List<CombatantState> GetAliveAllies() => GetAlive(_allyEntries);
 
-                case TargetType.AllyAoe:
-                    var allyTargets = GetAlive(_allyEntries);
-                    foreach (var target in allyTargets)
-                        ResolveHealOrBuff(actor, target, action);
-                    break;
+        /// <summary>Living enemies of the current wave. Used by resolvers for enemy-AoE targeting.</summary>
+        internal List<CombatantState> GetAliveWaveEnemies() => GetAlive(_currentWaveEnemyEntries);
 
-                case TargetType.Self:
-                    ResolveHealOrBuff(actor, actor, action);
-                    break;
-
-                case TargetType.SingleAlly:
-                    if (action.Target != null)
-                        ResolveHealOrBuff(actor, action.Target, action);
-                    break;
-
-                case TargetType.SingleEnemy:
-                default:
-                    if (action.Target != null)
-                        ResolveSingleTarget(actor, action.Target, action);
-                    break;
-            }
-        }
-
-        private void ResolveSingleTarget(CombatantState actor, CombatantState target, CombatAction action)
-        {
-            float effAtk = action.IsPhysical
-                ? actor.GetEffectiveStat(StatType.ATK)
-                : actor.GetEffectiveStat(StatType.MST);
-            float effDef = action.IsPhysical
-                ? target.GetEffectiveStat(StatType.DEF)
-                : target.GetEffectiveStat(StatType.SPR);
-
-            float cri = actor.Template.SecondaryStats.CRI;
-            bool isBlinded = actor.HasStatus(StatusEffect.Ceguera);
-
-            var result = DamageCalculator.Calculate(
-                effAtk, effDef, action.AbilityPower,
-                action.Element, target.Template.Element,
-                cri, action.IsPhysical, isBlinded);
-
-            if (result.IsMiss)
-            {
-                GameEvents.PublishDamageDealt(new DamageEvent
-                {
-                    Source = actor,
-                    Target = target,
-                    Result = result,
-                    ActualDamage = 0,
-                    DamageSource = action.Type == ActionType.Ability
-                        ? DamageSource.Ability : DamageSource.Attack
-                });
-                return;
-            }
-
-            int damage = result.FinalDamage;
-
-            // Guard reduction (GDD §Formulas: applied after full DSE calculation)
-            bool isGuarded = target.IsGuarding;
-            if (isGuarded)
-                damage = Mathf.Max(Mathf.FloorToInt(damage * GUARD_REDUCTION), 1);
-
-            int actual = target.ApplyDamage(damage);
-
-            GameEvents.PublishDamageDealt(new DamageEvent
-            {
-                Source = actor,
-                Target = target,
-                Result = result,
-                IsGuarded = isGuarded,
-                ActualDamage = actual,
-                DamageSource = action.Type == ActionType.Ability
-                    ? DamageSource.Ability : DamageSource.Attack
-            });
-
-            // Wake sleeping targets on damage (GDD: Sueño removed by damage)
-            if (actual > 0 && target.HasStatus(StatusEffect.Sueno))
-            {
-                target.RemoveStatus(StatusEffect.Sueno);
-                GameEvents.PublishStatusRemoved(new StatusRemovedEvent
-                {
-                    Target = target,
-                    Effect = StatusEffect.Sueno,
-                    Reason = StatusRemovalReason.WokenByDamage
-                });
-            }
-
-            if (target.IsKO)
-            {
-                HandleDeath(target);
-            }
-            else
-            {
-                ApplySecondaryEffects(actor, target, action.AbilityData);
-            }
-        }
-
-        private void ResolveHealOrBuff(CombatantState source, CombatantState target, CombatAction action)
-        {
-            // Placeholder for heal/buff ability resolution (expanded in S2-04)
-            int healAmount = HealCalculator.Calculate(
-                source.GetEffectiveStat(StatType.MST), action.AbilityPower);
-            int actual = target.ApplyHealing(healAmount);
-
-            GameEvents.PublishHealApplied(new HealEvent
-            {
-                Source = source,
-                Target = target,
-                Amount = actual
-            });
-        }
-
-        // ====================================================================
-        // SECONDARY EFFECTS
-        // ====================================================================
-
-        private void ApplySecondaryEffects(CombatantState source, CombatantState target,
-            AbilityData ability)
-        {
-            if (ability?.SecondaryEffects == null) return;
-
-            foreach (var effect in ability.SecondaryEffects)
-            {
-                if (UnityEngine.Random.value > effect.Probability) continue;
-
-                // Muerte: instant kill if target HP% below threshold (bosses immune)
-                if (effect.Effect == StatusEffect.Muerte)
-                {
-                    ResolveMuerte(source, target, effect.Param);
-                    continue;
-                }
-
-                var status = new StatusInstance
-                {
-                    Effect = effect.Effect,
-                    RemainingTurns = effect.Duration,
-                    Param = effect.Param,
-                    SourceAbilityId = ability.Id
-                };
-                target.ApplyStatus(status);
-
-                GameEvents.PublishStatusApplied(new StatusAppliedEvent
-                {
-                    Source = source,
-                    Target = target,
-                    Status = status
-                });
-            }
-        }
-
-        /// <summary>
-        /// Resolves Muerte (instant kill threshold). Kills target if HP% &lt; threshold.
-        /// Bosses are immune.
-        /// </summary>
-        private void ResolveMuerte(CombatantState source, CombatantState target, float threshold)
-        {
-            if (target.IsBoss) return;
-
-            float hpPercent = (float)target.CurrentHP / target.MaxHP;
-            if (hpPercent < threshold)
-            {
-                int lethalDamage = target.CurrentHP;
-                target.ApplyDamage(lethalDamage);
-
-                GameEvents.PublishDamageDealt(new DamageEvent
-                {
-                    Source = source,
-                    Target = target,
-                    ActualDamage = lethalDamage,
-                    DamageSource = DamageSource.Ability
-                });
-
-                HandleDeath(target);
-            }
-        }
+        /// <summary>Notifies the manager that a resolver killed a combatant.</summary>
+        internal void NotifyDeath(CombatantState combatant) => HandleDeath(combatant);
 
         // ====================================================================
         // DEATH & BATTLE END
@@ -620,7 +380,7 @@ namespace BlacktideRequiem.Core.Combat
             _currentWaveEnemyEntries = new List<InitiativeEntry>(_config.Waves[index].Enemies);
             _enemies.Clear();
             foreach (var entry in _currentWaveEnemyEntries)
-                _enemies.Add(entry.Combatant);
+                _enemies.Add((CombatantState)entry.Combatant); // land config — S4-04 generalizes lists/events to ICombatant
 
             // Evaluate enemy synergies for this wave
             int enemyCaptainIdx = _config.Waves[index].EnemyCaptainIndex;
@@ -753,28 +513,10 @@ namespace BlacktideRequiem.Core.Combat
         }
 
         // ====================================================================
-        // DOT CALCULATION
-        // ====================================================================
-
-        private int CalculateDoTDamage(CombatantState combatant, StatusEffect dotType)
-        {
-            for (int i = 0; i < combatant.StatusEffects.Count; i++)
-            {
-                if (combatant.StatusEffects[i].Effect == dotType)
-                {
-                    float percent = combatant.StatusEffects[i].Param;
-                    int damage = Mathf.Max(Mathf.FloorToInt(combatant.MaxHP * percent), (int)DOT_MIN_DAMAGE);
-                    return damage;
-                }
-            }
-            return 0;
-        }
-
-        // ====================================================================
         // CC HELPERS
         // ====================================================================
 
-        private bool IsCC(CombatantState combatant)
+        private bool IsCC(ICombatant combatant)
         {
             if (combatant.CCImmunityTurns > 0)
                 return false;
@@ -783,7 +525,7 @@ namespace BlacktideRequiem.Core.Combat
                 || combatant.HasStatus(StatusEffect.Sueno);
         }
 
-        private StatusEffect GetActiveCC(CombatantState combatant)
+        private StatusEffect GetActiveCC(ICombatant combatant)
         {
             if (combatant.HasStatus(StatusEffect.Aturdimiento))
                 return StatusEffect.Aturdimiento;
@@ -801,7 +543,7 @@ namespace BlacktideRequiem.Core.Combat
             var result = new List<CombatantState>();
             foreach (var e in entries)
                 if (!e.Combatant.IsKO)
-                    result.Add(e.Combatant);
+                    result.Add((CombatantState)e.Combatant); // land config — S4-04 generalizes
             return result;
         }
     }

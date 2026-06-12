@@ -24,7 +24,8 @@ namespace BlacktideRequiem.Core.Combat
     /// </summary>
     public struct SynergyBuff
     {
-        public CombatantState Target;
+        /// <summary>Carrier whose SynergyBuffTarget BuffStack receives the buff.</summary>
+        public ITraitCarrier Target;
         public BuffInstance Buff;
     }
 
@@ -65,7 +66,7 @@ namespace BlacktideRequiem.Core.Combat
         /// <param name="captainIndex">Index of the primary captain in allies list.</param>
         /// <param name="isGuestFriend">Whether the last ally is a friend unit (second captain).</param>
         public static List<ActiveSynergy> Evaluate(
-            IReadOnlyList<CombatantState> allies,
+            IReadOnlyList<ITraitCarrier> allies,
             int captainIndex,
             bool isGuestFriend)
         {
@@ -96,7 +97,7 @@ namespace BlacktideRequiem.Core.Combat
         /// <param name="enemies">All enemy combatant states in the wave.</param>
         /// <param name="captainIndex">Index of the enemy captain (-1 = no captain).</param>
         public static List<ActiveSynergy> EvaluateEnemies(
-            IReadOnlyList<CombatantState> enemies,
+            IReadOnlyList<ITraitCarrier> enemies,
             int captainIndex)
         {
             var results = new List<ActiveSynergy>();
@@ -114,13 +115,12 @@ namespace BlacktideRequiem.Core.Combat
         /// Evaluates a single captain's traits against a team.
         /// </summary>
         private static void EvaluateCaptain(
-            IReadOnlyList<CombatantState> team,
-            CombatantState captain,
+            IReadOnlyList<ITraitCarrier> team,
+            ITraitCarrier captain,
             CaptainSource source,
             List<ActiveSynergy> results)
         {
-            if (captain.Template == null) return;
-            var captainTraits = captain.Template.Traits;
+            var captainTraits = captain.Traits;
             if (captainTraits == null) return;
 
             for (int t = 0; t < captainTraits.Count; t++)
@@ -182,10 +182,9 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>
         /// Checks if a combatant has a trait by ID.
         /// </summary>
-        private static bool HasTrait(CombatantState combatant, string traitId)
+        private static bool HasTrait(ITraitCarrier carrier, string traitId)
         {
-            if (combatant.Template == null) return false;
-            var traits = combatant.Template.Traits;
+            var traits = carrier.Traits;
             if (traits == null) return false;
 
             for (int i = 0; i < traits.Count; i++)
@@ -199,10 +198,9 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>
         /// Gets the UnitTraitEntry for a specific trait on a combatant, or null if not found.
         /// </summary>
-        private static UnitTraitEntry? GetTraitEntry(CombatantState combatant, string traitId)
+        private static UnitTraitEntry? GetTraitEntry(ITraitCarrier carrier, string traitId)
         {
-            if (combatant.Template == null) return null;
-            var traits = combatant.Template.Traits;
+            var traits = carrier.Traits;
             if (traits == null) return null;
 
             for (int i = 0; i < traits.Count; i++)
@@ -225,7 +223,7 @@ namespace BlacktideRequiem.Core.Combat
                 var buffs = synergies[s].Buffs;
                 for (int b = 0; b < buffs.Count; b++)
                 {
-                    buffs[b].Target.Buffs.Add(buffs[b].Buff);
+                    buffs[b].Target.SynergyBuffTarget.Add(buffs[b].Buff);
                 }
             }
         }
@@ -250,15 +248,16 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>
         /// Removes a specific buff instance from a combatant's BuffStack by reference equality.
         /// </summary>
-        private static void RemoveSynergyBuff(CombatantState target, BuffInstance buff)
+        private static void RemoveSynergyBuff(ITraitCarrier target, BuffInstance buff)
         {
             // BuffInstance is a class — reference equality works
-            var allBuffs = target.Buffs.All;
+            var stack = target.SynergyBuffTarget;
+            var allBuffs = stack.All;
             for (int i = allBuffs.Count - 1; i >= 0; i--)
             {
                 if (ReferenceEquals(allBuffs[i], buff))
                 {
-                    target.Buffs.RemoveAt(i);
+                    stack.RemoveAt(i);
                     return;
                 }
             }

@@ -693,6 +693,7 @@ namespace BlacktideRequiem.UI.Combat
             foreach (var entry in entries)
             {
                 if (entry.Combatant.IsKO) continue;
+                if (entry.Combatant is not CombatantState unit) continue; // land HUD: units only
 
                 var iconGo = new GameObject("Icon", typeof(RectTransform), typeof(Image));
                 iconGo.transform.SetParent(_iconsContainer, false);
@@ -706,7 +707,7 @@ namespace BlacktideRequiem.UI.Combat
 
                 // Text as child so Image and Text don't conflict (both are Graphic)
                 var label = CreateText(iconGo.transform,
-                    entry.Combatant.Template.DisplayName.Substring(0, 1).ToUpper(),
+                    unit.Template.DisplayName.Substring(0, 1).ToUpper(),
                     14, Color.white, TextAnchor.MiddleCenter, 36);
                 var labelRt = label.GetComponent<RectTransform>();
                 labelRt.anchorMin = Vector2.zero;

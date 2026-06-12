@@ -5,11 +5,13 @@ using BlacktideRequiem.Core.Data;
 namespace BlacktideRequiem.Core.Combat
 {
     /// <summary>
-    /// Runtime combat state for a single combatant (unit or ship).
+    /// Runtime combat state for a single land unit.
     /// Created at battle start, discarded at battle end. Not persisted.
+    /// Implements ICombatant (shared orchestration contract, ADR-004) and
+    /// ITraitCarrier (synergy evaluation).
     /// See Damage & Stats Engine GDD §States and ADR-001.
     /// </summary>
-    public class CombatantState
+    public class CombatantState : ICombatant
     {
         /// <summary>Reference to the static data template.</summary>
         public CharacterData Template { get; }
@@ -47,6 +49,21 @@ namespace BlacktideRequiem.Core.Combat
         private readonly Dictionary<string, int> _cooldowns = new();
 
         public bool IsKO => CurrentHP <= 0;
+
+        /// <summary>Element from the data template (Neutral if no template).</summary>
+        public Element Element => Template != null ? Template.Element : Element.Neutral;
+
+        /// <summary>Land units have no inherent status immunities (bosses' Muerte immunity is handled via IsBoss).</summary>
+        public bool IsImmuneTo(StatusEffect effect) => false;
+
+        // ICombatant exposes statuses read-only; the mutable List stays public for land code/tests.
+        IReadOnlyList<StatusInstance> ICombatant.StatusEffects => StatusEffects;
+
+        /// <summary>Traits from the data template (ITraitCarrier).</summary>
+        public IReadOnlyList<UnitTraitEntry> Traits => Template?.Traits;
+
+        /// <summary>Land units receive their synergy buffs on their own BuffStack (ITraitCarrier).</summary>
+        public BuffStack SynergyBuffTarget => Buffs;
 
         public CombatantState(CharacterData template, StatBlock levelStats, int level)
         {

@@ -67,12 +67,12 @@ namespace BlacktideRequiem.Tests.EditMode
 
             var queued = _bar.GetQueuedEntries();
             Assert.AreEqual(6, queued.Count);
-            Assert.AreEqual(90f, queued[0].Combatant.BaseStats.SPD);
-            Assert.AreEqual(80f, queued[1].Combatant.BaseStats.SPD);
-            Assert.AreEqual(70f, queued[2].Combatant.BaseStats.SPD);
-            Assert.AreEqual(65f, queued[3].Combatant.BaseStats.SPD);
-            Assert.AreEqual(50f, queued[4].Combatant.BaseStats.SPD);
-            Assert.AreEqual(40f, queued[5].Combatant.BaseStats.SPD);
+            Assert.AreEqual(90f, queued[0].Unit.BaseStats.SPD);
+            Assert.AreEqual(80f, queued[1].Unit.BaseStats.SPD);
+            Assert.AreEqual(70f, queued[2].Unit.BaseStats.SPD);
+            Assert.AreEqual(65f, queued[3].Unit.BaseStats.SPD);
+            Assert.AreEqual(50f, queued[4].Unit.BaseStats.SPD);
+            Assert.AreEqual(40f, queued[5].Unit.BaseStats.SPD);
         }
 
         [Test]
@@ -186,16 +186,16 @@ namespace BlacktideRequiem.Tests.EditMode
             _bar.BeginRound(entries);
 
             var first = _bar.AdvanceTurn();
-            Assert.AreEqual(90f, first.Combatant.BaseStats.SPD);
+            Assert.AreEqual(90f, first.Unit.BaseStats.SPD);
             Assert.AreEqual(TurnState.Active, first.State);
 
             _bar.CompleteCurrentTurn();
             var second = _bar.AdvanceTurn();
-            Assert.AreEqual(60f, second.Combatant.BaseStats.SPD);
+            Assert.AreEqual(60f, second.Unit.BaseStats.SPD);
 
             _bar.CompleteCurrentTurn();
             var third = _bar.AdvanceTurn();
-            Assert.AreEqual(30f, third.Combatant.BaseStats.SPD);
+            Assert.AreEqual(30f, third.Unit.BaseStats.SPD);
         }
 
         [Test]
@@ -250,7 +250,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             // First unit acts
             var first = _bar.AdvanceTurn();
-            Assert.AreEqual(90f, first.Combatant.BaseStats.SPD);
+            Assert.AreEqual(90f, first.Unit.BaseStats.SPD);
             _bar.CompleteCurrentTurn();
 
             // Buff the slow ally's SPD to overtake enemy
@@ -622,11 +622,11 @@ namespace BlacktideRequiem.Tests.EditMode
 
             // Advance through all turns — revived should be last
             var first = _bar.AdvanceTurn();
-            Assert.AreEqual(90f, first.Combatant.BaseStats.SPD);
+            Assert.AreEqual(90f, first.Unit.BaseStats.SPD);
             _bar.CompleteCurrentTurn();
 
             var second = _bar.AdvanceTurn();
-            Assert.AreEqual(70f, second.Combatant.BaseStats.SPD);
+            Assert.AreEqual(70f, second.Unit.BaseStats.SPD);
             _bar.CompleteCurrentTurn();
 
             var third = _bar.AdvanceTurn();
@@ -655,7 +655,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             var last = _bar.AdvanceTurn();
             Assert.IsNotNull(last, "0 SPD unit should still get a turn");
-            Assert.AreEqual(0f, last.Combatant.BaseStats.SPD);
+            Assert.AreEqual(0f, last.Unit.BaseStats.SPD);
         }
 
         [Test]
@@ -701,7 +701,7 @@ namespace BlacktideRequiem.Tests.EditMode
             {
                 var turn = _bar.AdvanceTurn();
                 Assert.IsNotNull(turn, $"Turn {i + 1} should not be null");
-                Assert.AreEqual(expectedOrder[i], turn.Combatant.BaseStats.SPD,
+                Assert.AreEqual(expectedOrder[i], turn.Unit.BaseStats.SPD,
                     $"Turn {i + 1} should be combatant with SPD {expectedOrder[i]}");
                 _bar.CompleteCurrentTurn();
             }

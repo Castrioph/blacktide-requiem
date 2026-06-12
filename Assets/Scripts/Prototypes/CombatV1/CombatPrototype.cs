@@ -170,7 +170,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
                     _currentActor = entry;
 
                     // Remove guard at start of this unit's turn
-                    _guarding.Remove(entry.Combatant);
+                    _guarding.Remove((CombatantState)entry.Combatant);
 
                     if (entry.Team == CombatTeam.Ally)
                         yield return StartCoroutine(PlayerTurn(entry));
@@ -187,7 +187,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
 
         IEnumerator PlayerTurn(InitiativeEntry entry)
         {
-            string name = entry.Combatant.Template.DisplayName;
+            string name = ((CombatantState)entry.Combatant).Template.DisplayName;
             Log($"<color=#6699FF>>> {name}'s turn</color>");
 
             // Loop allows cancel from target selection back to action selection
@@ -203,7 +203,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
                 // --- Guard ---
                 if (_chosenAction == ActionType.Guard)
                 {
-                    _guarding.Add(entry.Combatant);
+                    _guarding.Add((CombatantState)entry.Combatant);
                     Log($"  {name} takes a defensive stance! <color=#00CCCC>[GUARD]</color>");
                     break;
                 }
@@ -226,7 +226,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
                     continue; // Cancelled — back to action selection
 
                 bool useAbility = _chosenAction == ActionType.Ability;
-                ResolveAttack(entry.Combatant, _chosenTarget, useAbility);
+                ResolveAttack((CombatantState)entry.Combatant, _chosenTarget, useAbility);
                 break;
             }
 
@@ -239,7 +239,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
             _phase = Phase.EnemyTurn;
             yield return new WaitForSeconds(0.4f);
 
-            string name = entry.Combatant.Template.DisplayName;
+            string name = ((CombatantState)entry.Combatant).Template.DisplayName;
             Log($"<color=#FF6666>>> {name}'s turn</color>");
 
             var aliveAllies = GetAlive(_allyEntries);
@@ -249,7 +249,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
             bool useAbility = Random.value < 0.4f;
             var target = aliveAllies[Random.Range(0, aliveAllies.Count)];
 
-            ResolveAttack(entry.Combatant, target, useAbility);
+            ResolveAttack((CombatantState)entry.Combatant, target, useAbility);
 
             yield return new WaitForSeconds(0.3f);
             if (_phase != Phase.Victory && _phase != Phase.Defeat)
@@ -363,7 +363,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
             var result = new List<CombatantState>();
             foreach (var e in entries)
                 if (!e.Combatant.IsKO)
-                    result.Add(e.Combatant);
+                    result.Add((CombatantState)e.Combatant);
             return result;
         }
 
@@ -381,7 +381,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
             {
                 string color = e.Team == CombatTeam.Ally ? "#6699FF" : "#FF6666";
                 string boss = e.Combatant.IsBoss ? "*" : "";
-                names.Add($"<color={color}>{boss}{e.Combatant.Template.DisplayName}</color>");
+                names.Add($"<color={color}>{boss}{((CombatantState)e.Combatant).Template.DisplayName}</color>");
             }
             Log("Order: " + string.Join(" > ", names));
         }
@@ -492,7 +492,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
                 string boss = e.Combatant.IsBoss ? "*" : "";
 
                 GUILayout.Label(
-                    $"<color={color}>{arrow}{boss}{e.Combatant.Template.DisplayName}</color>",
+                    $"<color={color}>{arrow}{boss}{((CombatantState)e.Combatant).Template.DisplayName}</color>",
                     _smallLabel, GUILayout.ExpandWidth(false));
 
                 if (i < entries.Count - 1)
@@ -516,7 +516,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
 
             foreach (var entry in team)
             {
-                var c = entry.Combatant;
+                var c = (CombatantState)entry.Combatant;
                 bool active = _currentActor != null && _currentActor.Combatant == c;
                 bool dead = c.IsKO;
                 bool guarding = _guarding.Contains(c);
@@ -618,7 +618,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
 
         void DrawActionButtons()
         {
-            var actor = _currentActor.Combatant;
+            var actor = (CombatantState)_currentActor.Combatant;
             string name = actor.Template.DisplayName;
             GUILayout.Label($"<color=#FFFF00>{name}</color> — Choose action:", _labelStyle);
             GUILayout.Space(6);
@@ -649,7 +649,7 @@ namespace BlacktideRequiem.Prototypes.CombatV1
         void DrawTargetSelection()
         {
             string actionName = _chosenAction == ActionType.Ability
-                && _abilities.TryGetValue(_currentActor.Combatant, out var ab)
+                && _abilities.TryGetValue((CombatantState)_currentActor.Combatant, out var ab)
                 ? ab.Name : "Attack";
 
             GUILayout.Label($"<color=#FFFF00>{actionName}</color> — Select target:", _labelStyle);

@@ -258,7 +258,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             // Act: enemy attacks sleeping ally
             var entry = _manager.AdvanceTurn(); // enemy (faster)
-            Assert.AreEqual("enemy", entry.Combatant.Template.Id);
+            Assert.AreEqual("enemy", entry.Unit.Template.Id);
 
             var attack = CombatAction.BasicAttack(ally, true);
             _manager.ResolveAction(attack);

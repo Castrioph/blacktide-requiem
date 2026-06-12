@@ -31,8 +31,11 @@ namespace BlacktideRequiem.Core.Combat
     /// </summary>
     public class InitiativeEntry
     {
-        /// <summary>Runtime combat state for this combatant.</summary>
-        public CombatantState Combatant { get; }
+        /// <summary>Runtime combat state for this combatant (land unit or ship).</summary>
+        public ICombatant Combatant { get; }
+
+        /// <summary>Land-unit view of the combatant (null for ships). Convenience for land-only code.</summary>
+        public CombatantState Unit => Combatant as CombatantState;
 
         /// <summary>Team assignment for tie-breaking.</summary>
         public CombatTeam Team { get; }
@@ -46,7 +49,7 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>Whether this entry is a Limit Break (extra turn) insertion.</summary>
         public bool IsLimitBreak { get; set; }
 
-        public InitiativeEntry(CombatantState combatant, CombatTeam team, int slotIndex)
+        public InitiativeEntry(ICombatant combatant, CombatTeam team, int slotIndex)
         {
             Combatant = combatant;
             Team = team;
@@ -69,7 +72,7 @@ namespace BlacktideRequiem.Core.Combat
     public class InitiativeBar
     {
         private readonly List<InitiativeEntry> _bar = new();
-        private readonly HashSet<CombatantState> _limitBreakUsedThisRound = new();
+        private readonly HashSet<ICombatant> _limitBreakUsedThisRound = new();
 
         /// <summary>Current round number (1-based, incremented on each BeginRound).</summary>
         public int RoundNumber { get; private set; }
@@ -235,7 +238,7 @@ namespace BlacktideRequiem.Core.Combat
         /// is dead, or is stunned.
         /// See Initiative Bar GDD §Limit Break rules.
         /// </summary>
-        public bool InsertLimitBreak(CombatantState combatant)
+        public bool InsertLimitBreak(ICombatant combatant)
         {
             // Dead units cannot receive extra turns
             if (combatant.IsKO)
@@ -289,7 +292,7 @@ namespace BlacktideRequiem.Core.Combat
         /// <summary>
         /// Immediately removes a dead combatant from the bar.
         /// </summary>
-        public void RemoveDead(CombatantState combatant)
+        public void RemoveDead(ICombatant combatant)
         {
             for (int i = _bar.Count - 1; i >= 0; i--)
             {
@@ -304,7 +307,7 @@ namespace BlacktideRequiem.Core.Combat
         /// Inserts a revived combatant at the end of the current round's bar.
         /// Next round they are positioned normally by SPD.
         /// </summary>
-        public void InsertRevived(CombatantState combatant, CombatTeam team, int slotIndex)
+        public void InsertRevived(ICombatant combatant, CombatTeam team, int slotIndex)
         {
             var entry = new InitiativeEntry(combatant, team, slotIndex)
             {

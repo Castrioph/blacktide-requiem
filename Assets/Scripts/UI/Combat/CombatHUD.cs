@@ -561,13 +561,14 @@ namespace BlacktideRequiem.UI.Combat
             foreach (var entry in entries)
             {
                 if (entry.Combatant.IsKO) continue;
+                if (entry.Combatant is not CombatantState unit) continue; // land HUD: units only
 
-                var icon = new Label(entry.Combatant.Template.DisplayName.Substring(0, 1).ToUpper());
+                var icon = new Label(unit.Template.DisplayName.Substring(0, 1).ToUpper());
                 icon.AddToClassList("init-icon");
                 icon.AddToClassList(entry.Team == CombatTeam.Ally ? "init-icon-ally" : "init-icon-enemy");
                 if (entry.Combatant == activeUnit)
                     icon.AddToClassList("init-icon-active");
-                icon.tooltip = entry.Combatant.Template.DisplayName;
+                icon.tooltip = unit.Template.DisplayName;
                 _initiativeIcons.Add(icon);
             }
         }

@@ -176,17 +176,17 @@ namespace BlacktideRequiem.Tests.EditMode
 
             // SPDs: ally1=80, enemy1=70, ally2=60
             var first = _manager.AdvanceTurn();
-            Assert.AreEqual("ally1", first.Combatant.Template.Id);
+            Assert.AreEqual("ally1", first.Unit.Template.Id);
             _manager.ResolveAction(CombatAction.PassTurn());
             _manager.CompleteTurn();
 
             var second = _manager.AdvanceTurn();
-            Assert.AreEqual("enemy1", second.Combatant.Template.Id);
+            Assert.AreEqual("enemy1", second.Unit.Template.Id);
             _manager.ResolveAction(CombatAction.PassTurn());
             _manager.CompleteTurn();
 
             var third = _manager.AdvanceTurn();
-            Assert.AreEqual("ally2", third.Combatant.Template.Id);
+            Assert.AreEqual("ally2", third.Unit.Template.Id);
         }
 
         [Test]
@@ -226,7 +226,7 @@ namespace BlacktideRequiem.Tests.EditMode
             var entry = _manager.AdvanceTurn();
             _manager.ResolveAction(CombatAction.Guard());
 
-            Assert.IsTrue(entry.Combatant.IsGuarding);
+            Assert.IsTrue(entry.Unit.IsGuarding);
         }
 
         [Test]
@@ -251,7 +251,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             // Enemy attacks the guarding ally (deterministic: CRI=0, variance default)
             var enemy = _manager.AdvanceTurn();
-            var attack = CombatAction.BasicAttack(ally.Combatant, true);
+            var attack = CombatAction.BasicAttack(ally.Unit, true);
             _manager.ResolveAction(attack);
 
             int damageTaken = hpBeforeAttack - ally.Combatant.CurrentHP;
@@ -259,7 +259,7 @@ namespace BlacktideRequiem.Tests.EditMode
             // Without guard: ATK=50 * 1.8 - DEF=0 * 1.0 = 90, final = 90 * 1.0 * 1.0 * variance
             // With guard: damage * 0.50
             // Since damage uses Random for crit/variance, just verify guard flag was applied
-            Assert.IsTrue(ally.Combatant.IsGuarding);
+            Assert.IsTrue(ally.Unit.IsGuarding);
             // Damage should be less than unguarded (we can't be exact due to randomness,
             // but we can verify guard was applied by checking the event)
             Assert.IsTrue(damageTaken > 0, "Should take some damage even when guarding");
@@ -280,7 +280,7 @@ namespace BlacktideRequiem.Tests.EditMode
             // Ally guards
             var ally = _manager.AdvanceTurn();
             _manager.ResolveAction(CombatAction.Guard());
-            Assert.IsTrue(ally.Combatant.IsGuarding);
+            Assert.IsTrue(ally.Unit.IsGuarding);
             _manager.CompleteTurn();
 
             // Enemy passes
@@ -291,7 +291,7 @@ namespace BlacktideRequiem.Tests.EditMode
             // New round — ally's guard should be removed when their turn starts
             _manager.BeginRound();
             var allyTurn2 = _manager.AdvanceTurn();
-            Assert.IsFalse(allyTurn2.Combatant.IsGuarding,
+            Assert.IsFalse(allyTurn2.Unit.IsGuarding,
                 "Guard should be removed at start of combatant's next turn");
         }
 
@@ -351,7 +351,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             // AdvanceTurn should skip stunned ally and return enemy
             var next = _manager.AdvanceTurn();
-            Assert.AreEqual("enemy", next.Combatant.Template.Id,
+            Assert.AreEqual("enemy", next.Unit.Template.Id,
                 "Stunned ally should be skipped");
             Assert.AreEqual(InitiativeBar.CC_IMMUNITY_DURATION,
                 config.Allies[0].Combatant.CCImmunityTurns,
@@ -381,7 +381,7 @@ namespace BlacktideRequiem.Tests.EditMode
             });
 
             var next = _manager.AdvanceTurn();
-            Assert.AreEqual("enemy", next.Combatant.Template.Id);
+            Assert.AreEqual("enemy", next.Unit.Template.Id);
             Assert.IsTrue(config.Allies[0].Combatant.HasStatus(StatusEffect.Sueno),
                 "Sleep should persist after skip (removed by damage, not skip)");
         }
@@ -469,7 +469,7 @@ namespace BlacktideRequiem.Tests.EditMode
             _manager.BeginRound();
 
             var ally = _manager.AdvanceTurn();
-            var attack = CombatAction.BasicAttack(config.Waves[0].Enemies[0].Combatant, true);
+            var attack = CombatAction.BasicAttack(config.Waves[0].Enemies[0].Unit, true);
             _manager.ResolveAction(attack);
 
             Assert.AreEqual(BattlePhase.Victory, _manager.Phase);
@@ -496,7 +496,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             // Enemy acts first (SPD 90 > 70)
             var enemy = _manager.AdvanceTurn();
-            var attack = CombatAction.BasicAttack(config.Allies[0].Combatant, true);
+            var attack = CombatAction.BasicAttack(config.Allies[0].Unit, true);
             _manager.ResolveAction(attack);
 
             Assert.AreEqual(BattlePhase.Defeat, _manager.Phase);
@@ -530,7 +530,7 @@ namespace BlacktideRequiem.Tests.EditMode
                 Param = 1.0f // 100% max HP — will kill
             });
 
-            var attack = CombatAction.BasicAttack(config.Waves[0].Enemies[0].Combatant, true);
+            var attack = CombatAction.BasicAttack(config.Waves[0].Enemies[0].Unit, true);
             _manager.ResolveAction(attack);
 
             // Poison ticks after action, kills ally. All enemies also dead.
@@ -654,7 +654,7 @@ namespace BlacktideRequiem.Tests.EditMode
             // Ally1 kills enemy1
             _manager.AdvanceTurn();
             _manager.ResolveAction(CombatAction.BasicAttack(
-                config.Waves[0].Enemies[0].Combatant, true));
+                config.Waves[0].Enemies[0].Unit, true));
             _manager.CompleteTurn();
 
             // Ally2's turn — context should only show 1 enemy
@@ -704,7 +704,7 @@ namespace BlacktideRequiem.Tests.EditMode
 
             _manager.AdvanceTurn();
             _manager.ResolveAction(CombatAction.BasicAttack(
-                config.Waves[0].Enemies[0].Combatant, true));
+                config.Waves[0].Enemies[0].Unit, true));
 
             Assert.IsNotNull(diedUnit);
             Assert.AreEqual("enemy", diedUnit.Template.Id);

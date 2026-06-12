@@ -181,6 +181,12 @@ namespace BlacktideRequiem.Core.Combat
         bool IsKO { get; }
         bool IsBoss { get; }
 
+        // Superficie de HP (el barco la mapea a HHP) — compartida por UI y DoTs
+        int CurrentHP { get; }
+        int MaxHP { get; }
+        int ApplyDamage(int damage);
+        int ApplyHealing(int amount);
+
         // Initiative + pipeline genérico
         float GetEffectiveStat(StatType stat);   // SPD para orden de turno
         BuffStack Buffs { get; }
