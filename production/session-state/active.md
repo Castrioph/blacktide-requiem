@@ -1,35 +1,28 @@
 # Active Session State
 
 <!-- STATUS -->
-Epic: Combate Naval
-Feature: Sprint 4 — Naval-first (production/sprints/sprint-004.md)
-Task: S4-06 ✅ (812ee18) + S4-07 ✅ (ce7bb51, playtested por usuario). Sprint core completo. Siguiente: S4-09 playtest report (¿es divertido?) o S4-08 guest capitán o retro.
+Epic: Vertical Slice Visual (PIVOT)
+Feature: Sprint 5 (production/sprints/sprint-005.md) — congelados sistemas nuevos
+Task: Sprint 5 creado. Siguiente: S5-01 Art Bible (bloquea arte) + S5-02 contenido naval (paralelo).
 <!-- /STATUS -->
 
 - Updated: 2026-06-13
-- Sprint/Task: sprint-004 / S4-07 ✅ commiteado y pushed — 344/344 tests
-- Verification Path: editor-tools (compile ✅, flow sim MainMenu→StageSelect→
-  TeamSelect→NavalCombat→Results ✅, Results muestra "150 Doblones, 5 Gemas")
+- Sprint/Task: sprint-005 / kickoff — sprint-004 cerrado (pivot)
+- Verification Path: cada tarea exige verificación visual (capture_ui_canvas o playtest)
 
-## S4-07 estado
+## Contexto del pivot (2026-06-13)
 
-- NavalStageData : StageData (PlayerShip + NavalWaves + EnemyCrewPool) +
-  NavalStageController.BuildNavalBattle (pure C#, 9 tests) — crew ciclada en
-  slots, 1 NavalEnemyAI por enemigo, sinergias evaluadas.
-- GameFlowManager.LoadCombat → escena NavalCombat si stage is NavalStageData
-  (SceneRegistry.NavalCombat). Bootstrap flow-driven con fallback demo.
-- Assets: stage_004_mar_de_los_lamentos (registrado en StageRegistry, accent
-  teal en StageAccentPalette), reward_stage_004 (150 DOB + 5 GDC),
-  player_wallet (Assets/Data/Economy/). RewardDispatcher conectado en
-  bootstrap; Results muestra línea "Recompensas:" en victoria.
-- FIX: Results.unity tenía StandaloneInputModule legacy → InputSystemUIInputModule
-  (FixEventSystemModules.cs recorre todas las escenas del build).
-- Gotcha: estado de play session contamina GFM entre corridas de sim —
-  verificar SelectedStage tras cada paso si un sim da resultados raros.
+- S4-09 playtest: usuario consideró cancelar. Root cause: cero contenido naval
+  autorado (BaseAbilities/SeaAbilities/Traits todos []) + presentación texto
+  plano. Código sano (344 tests con datos sintéticos).
+- Decisión usuario: opción 1 — sprint 100% presentación/contenido en stage_004.
+- Gate final binario: "¿esto ya parece un juego?" No → conversación cancelación.
+- Reglas: cero sistemas nuevos; todo Done debe VERSE; assets first; agentes
+  art-director/ux-designer obligatorios en arte/UX.
 
 ## Pendiente
 
-- Sprint 4 Must+Should completos (S4-01..07 ✅, playtest usuario OK tras fijar
-  Game view a portrait). Nice-to-have: S4-08 guest 2º capitán, S4-09
-  /playtest-report (Open Question #5: balance Abordaje vs Bombardeo).
-- Cierre de sprint: /retrospective antes de abrir Sprint 5 (gacha + save/load).
+- S5-01 Art Bible + pipeline IA (primera, S) — aprobar 2-3 muestras con usuario.
+- S5-02 contenido naval autorado (M, paralelo) — fix root cause S4-09.
+- Luego S5-03 arte batalla → S5-04 juice → S5-05 audio → S5-07 re-playtest.
+- Commits pendientes: playtest report S4-09, sprint-005.md, cierre sprint-004.

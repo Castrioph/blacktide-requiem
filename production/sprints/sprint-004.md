@@ -1,6 +1,6 @@
 # Sprint 4 — Combate Naval (Naval-first)
 
-> **Status**: Active
+> **Status**: Closed (2026-06-13 — cierre anticipado por pivot a Sprint 5 Vertical Slice Visual; S4-01..07 ✅, S4-09 ✅ con hallazgo crítico, S4-08 congelada. Ver production/playtests/S4-09-naval-playtest.md y sprint-005.md)
 > **Method**: Kanban (WIP=1) + T-shirt sizing (S/M/L)
 > **Created**: 2026-06-12
 > **Kickoff**: 2026-06-12
