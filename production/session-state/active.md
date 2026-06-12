@@ -3,11 +3,11 @@
 <!-- STATUS -->
 Epic: Combate Naval
 Feature: Sprint 4 — Naval-first (production/sprints/sprint-004.md)
-Task: S4-06 ✅ (812ee18). S4-07 implementado + flujo verificado con capture; PENDIENTE playtest usuario (DoD sprint) y commit.
+Task: S4-06 ✅ (812ee18) + S4-07 ✅ (ce7bb51, playtested por usuario). Sprint core completo. Siguiente: S4-09 playtest report (¿es divertido?) o S4-08 guest capitán o retro.
 <!-- /STATUS -->
 
 - Updated: 2026-06-13
-- Sprint/Task: sprint-004 / S4-07 stage naval + flujo — 344/344 tests (9 nuevos)
+- Sprint/Task: sprint-004 / S4-07 ✅ commiteado y pushed — 344/344 tests
 - Verification Path: editor-tools (compile ✅, flow sim MainMenu→StageSelect→
   TeamSelect→NavalCombat→Results ✅, Results muestra "150 Doblones, 5 Gemas")
 
@@ -27,9 +27,9 @@ Task: S4-06 ✅ (812ee18). S4-07 implementado + flujo verificado con capture; PE
 - Gotcha: estado de play session contamina GFM entre corridas de sim —
   verificar SelectedStage tras cada paso si un sim da resultados raros.
 
-## Pendiente (antes de cerrar S4-06+S4-07 como Done)
+## Pendiente
 
-- Playtest usuario flujo completo: Play en MainMenu → Misiones → "Mar de los
-  Lamentos" → ZARPAR → equipo → combate naval (3 oleadas, jefe) → Results →
-  Volver. Sims de apoyo: SimNavalFlow.cs, SimNavalActions.cs.
-- Commit S4-07 tras playtest. Quedan: S4-08/S4-09 (nice-to-have) + retro.
+- Sprint 4 Must+Should completos (S4-01..07 ✅, playtest usuario OK tras fijar
+  Game view a portrait). Nice-to-have: S4-08 guest 2º capitán, S4-09
+  /playtest-report (Open Question #5: balance Abordaje vs Bombardeo).
+- Cierre de sprint: /retrospective antes de abrir Sprint 5 (gacha + save/load).
