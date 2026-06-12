@@ -3,12 +3,12 @@
 <!-- STATUS -->
 Epic: Combate Naval
 Feature: Sprint 4 — Naval-first (production/sprints/sprint-004.md)
-Task: S4-02 COMPLETO (a: refactor ✅ commiteado; b: ShipCombatant+assets ✅ pendiente commit). Siguiente: S4-03 stats engine + recálculo.
+Task: S4-02 ✅ + S4-03 ✅ (286/286 tests). Siguiente: S4-04 naval combat core (L) — NavalTurnResolver: 6 acciones, DoT split, LB, oleadas.
 <!-- /STATUS -->
 
 - Updated: 2026-06-12
-- Sprint/Task: sprint-004 / S4-02 Ship Data Model ✅
-- Verification Path: editor-tools (Coplay check_compile + TestRunnerApi) ✅ 275/275
+- Sprint/Task: sprint-004 / S4-03 Naval stats engine ✅
+- Verification Path: editor-tools (Coplay check_compile + TestRunnerApi) ✅ 286/286
 
 ## S4-02a (commiteado)
 
@@ -18,16 +18,21 @@ Task: S4-02 COMPLETO (a: refactor ✅ commiteado; b: ShipCombatant+assets ✅ pe
 - Fix test preexistente TeamComposition (instancias roster) → 255/255
 - Runner: Assets/Editor/RunEditModeTests.cs → test-results-s402a.txt (gitignored)
 
-## S4-02b (pendiente commit)
+## S4-02b (commiteado)
 
-- ShipCombatant (ICombatant: hull, MP, statuses+inmunidades, cooldowns, pool,
-  cache aditivo base+upgrade+crew × buff modifier) + CrewMemberState (HP fijo
-  por rol, ITraitCarrier → buffs al BuffStack del barco)
-- 5 assets: Assets/Data/Ships/ (Marea Espectral aliado, Balandra/Bergantín/
-  Galeón enemigos N/E/J, Serpiente Abisal criatura sin crew)
-- 20 tests nuevos (ShipCombatantTests 16 + ShipAssetsTests 4) → 275/275
-- Nota: "visible en juego" del acceptance se completa en S4-07 (stage naval)
+- ShipCombatant + CrewMemberState + 5 assets Assets/Data/Ships/ + 20 tests
+- "Visible en juego" del acceptance se completa en S4-07 (stage naval)
 - Crew contribution usa BaseStats nivel 1 (consistente con StageController)
+
+## S4-03 (pendiente commit)
+
+- ShipCombatant.DamageCrewMember: muerte → RecalculateFromCrew +
+  EvaluateCrewSynergies en el mismo call (stats, pool y trait count — GDD §6)
+- EvaluateCrewSynergies: SynergyEvaluator sobre crew VIVA, capitán crew =
+  primario; buffs → BuffStack del barco; re-evaluación idempotente
+  (guest 2º capitán diferido a S4-08); GetLivingCrew para targeting
+- 11 tests NavalStatsEngineTests → 286/286 (31 nuevos en S4; DoD pide 40+)
+- Eventos GameEvents navales (OnCrewDied etc.) diferidos a S4-04 (quien orquesta)
 
 ## Contexto S3 (cerrado 2026-06-12)
 

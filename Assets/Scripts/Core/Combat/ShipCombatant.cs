@@ -83,6 +83,12 @@ namespace BlacktideRequiem.Core.Combat
         public IReadOnlyList<UnitTraitEntry> Traits => null;
         public BuffStack SynergyBuffTarget => Buffs;
 
+        // --- Crew synergies (evaluated over living crew; buffs land on this ship's BuffStack) ---
+
+        /// <summary>Currently active crew trait synergies.</summary>
+        public IReadOnlyList<ActiveSynergy> CrewSynergies => _crewSynergies;
+        private List<ActiveSynergy> _crewSynergies = new();
+
         // --- Effective stat cache (additive part: base + upgrade + crew) ---
         private ShipStatBlock _additiveStats;
 
@@ -174,6 +180,74 @@ namespace BlacktideRequiem.Core.Combat
             _additiveStats = stats;
 
             RebuildAbilityPool();
+        }
+
+        /// <summary>
+        /// Applies damage to a crew member (Abordaje, Veneno/Sangrado naval).
+        /// On death, immediately recalculates ship stats, rebuilds the ability
+        /// pool and re-evaluates crew synergies (Combate Naval GDD §6: the dead
+        /// member's stats, abilities AND trait count are lost at once; captain
+        /// death drops captain-sourced synergies via re-evaluation).
+        /// Returns the actual damage dealt; out param signals death this hit.
+        /// </summary>
+        public int DamageCrewMember(CrewMemberState crew, int damage, out bool died)
+        {
+            bool wasAlive = !crew.IsDead;
+            int actual = crew.ApplyDamage(damage);
+            died = wasAlive && crew.IsDead;
+
+            if (died)
+            {
+                RecalculateFromCrew();
+                EvaluateCrewSynergies();
+            }
+            return actual;
+        }
+
+        /// <summary>
+        /// Re-evaluates crew trait synergies over LIVING crew with the crew
+        /// Capitán as primary captain. Removes previous synergy buffs first.
+        /// Buffs land on this ship's BuffStack (ITraitCarrier.SynergyBuffTarget).
+        /// Guest-as-second-captain is S4-08 (not evaluated yet).
+        /// Returns the new active synergies; event publishing is the caller's
+        /// responsibility (CombatManager/NavalTurnResolver, S4-04).
+        /// </summary>
+        public IReadOnlyList<ActiveSynergy> EvaluateCrewSynergies()
+        {
+            SynergyEvaluator.RemoveBuffs(_crewSynergies);
+            _crewSynergies = new List<ActiveSynergy>();
+
+            var livingCrew = new List<CrewMemberState>();
+            int captainIndex = -1;
+            for (int i = 0; i < _crew.Count; i++)
+            {
+                if (_crew[i].IsDead) continue;
+                if (_crew[i].Role == NavalRole.Capitan && captainIndex < 0)
+                    captainIndex = livingCrew.Count;
+                livingCrew.Add(_crew[i]);
+            }
+
+            if (captainIndex >= 0)
+            {
+                _crewSynergies = SynergyEvaluator.Evaluate(
+                    livingCrew, captainIndex, isGuestFriend: false);
+                SynergyEvaluator.ApplyBuffs(_crewSynergies);
+            }
+
+            return _crewSynergies;
+        }
+
+        /// <summary>Crew member alive in the Capitán slot? (synergy precondition)</summary>
+        public bool CaptainAlive => Captain != null && !Captain.IsDead;
+
+        /// <summary>Living crew members that Abordaje / crew DoTs can target.</summary>
+        public List<CrewMemberState> GetLivingCrew()
+        {
+            var result = new List<CrewMemberState>();
+            for (int i = 0; i < _crew.Count; i++)
+                if (!_crew[i].IsDead)
+                    result.Add(_crew[i]);
+            return result;
         }
 
         private void RebuildAbilityPool()
