@@ -1,9 +1,9 @@
 # Active Session State
 
 <!-- STATUS -->
-Epic: Content Loop (land side)
-Feature: Sprint 3 — Content Loop
-Task: Sprint 3 CERRADO (S3-11 Done, commits pushed, retro escrita). Siguiente: S4 planning — ADR-004 Naval primero.
+Epic: Combate Naval
+Feature: Sprint 4 — Naval-first (production/sprints/sprint-004.md)
+Task: S4 abierto. Siguiente: S4-01 ADR-004 Naval Combat Architecture (bloquea todo).
 <!-- /STATUS -->
 
 - Updated: 2026-06-12
