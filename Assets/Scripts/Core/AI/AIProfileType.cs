@@ -13,6 +13,10 @@ namespace BlacktideRequiem.Core.AI
         /// <summary>Targets self or lowest HP ally. Buffs DEF/SPR if no buffs, else attacks.</summary>
         Defensivo,
 
+        /// <summary>Targets highest ATK/MST threat. Prefers elemental-advantage
+        /// abilities; in naval combat boards the enemy Capitán tactically.</summary>
+        Estratega,
+
         /// <summary>Random target, random ability.</summary>
         Caotico
     }

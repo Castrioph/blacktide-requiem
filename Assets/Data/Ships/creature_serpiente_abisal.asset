@@ -28,3 +28,6 @@ MonoBehaviour:
   RoleSlots: []
   BaseAbilities: []
   Acquisition: 0
+  Tier: 0
+  AIProfile: 0
+  BossPhases: []

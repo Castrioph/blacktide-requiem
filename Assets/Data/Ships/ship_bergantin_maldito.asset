@@ -43,3 +43,6 @@ MonoBehaviour:
     IsGuestSlot: 0
   BaseAbilities: []
   Acquisition: 0
+  Tier: 1
+  AIProfile: 2
+  BossPhases: []

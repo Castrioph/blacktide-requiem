@@ -52,6 +52,17 @@ namespace BlacktideRequiem.Core.Data
         [Tooltip("How this ship is acquired")]
         public ShipAcquisition Acquisition;
 
+        [Header("Enemy AI (enemy ships/creatures only)")]
+
+        [Tooltip("Enemy tier — ignored for player ships")]
+        public EnemyTier Tier;
+
+        [Tooltip("Base AI profile (Jefe: profile of phase 1)")]
+        public AI.AIProfileType AIProfile;
+
+        [Tooltip("Boss phases in descending HPThreshold order. Empty for Normal/Elite.")]
+        public List<NavalBossPhase> BossPhases = new();
+
         // ====================================================================
         // UPGRADE BONUS CALCULATION
         // ====================================================================

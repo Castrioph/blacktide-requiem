@@ -209,12 +209,13 @@ namespace BlacktideRequiem.Tests.EditMode
             // Arrange
             var (ally, enemy) = StartSimpleBattle();
 
-            // Act — Cañonazo: FPW 100 × 1.8 − HDF 80 × 1.0 = 100 base
+            // Act — Cañonazo: FPW 100 × 1.8 − effHDF 83 × 1.0 = 97 base
+            // (effHDF = 80 + Artillero crew contribution floor(40×0.15×0.5) = 3)
             ResolveAndComplete(CombatAction.Cannonball(enemy));
 
             // Assert
             int damage = enemy.MaxHHP - enemy.CurrentHHP;
-            AssertDamageInVarianceRange(damage, 100f);
+            AssertDamageInVarianceRange(damage, 97f);
         }
 
         [Test]
@@ -242,13 +243,13 @@ namespace BlacktideRequiem.Tests.EditMode
             var (ally, enemy) = StartSimpleBattle();
             enemy.IsManeuvering = true;
 
-            // Act — base 100 halved to 50 (floor applied after variance)
+            // Act — base 97 (effHDF 83 with crew contribution) halved by Maniobra
             ResolveAndComplete(CombatAction.Cannonball(enemy));
 
             // Assert
             int damage = enemy.MaxHHP - enemy.CurrentHHP;
-            Assert.GreaterOrEqual(damage, Mathf.FloorToInt(100f * 0.95f * 0.5f));
-            Assert.LessOrEqual(damage, Mathf.FloorToInt(100f * 1.05f * 0.5f) + 1);
+            Assert.GreaterOrEqual(damage, Mathf.FloorToInt(97f * 0.95f * 0.5f));
+            Assert.LessOrEqual(damage, Mathf.FloorToInt(97f * 1.05f * 0.5f) + 1);
         }
 
         [Test]
@@ -481,13 +482,13 @@ namespace BlacktideRequiem.Tests.EditMode
             var ability = MakeAbility("andanada", power: 2.0f, mpCost: 15);
             int mpBefore = ally.CurrentMP;
 
-            // Act — (100×1.8 − 80×1.0) × 2.0 = 200 base
+            // Act — (100×1.8 − effHDF 83×1.0) × 2.0 = 194 base
             ResolveAndComplete(CombatAction.FromAbility(ability, enemy));
 
             // Assert
             Assert.AreEqual(mpBefore - 15, ally.CurrentMP);
             int damage = enemy.MaxHHP - enemy.CurrentHHP;
-            AssertDamageInVarianceRange(damage, 200f);
+            AssertDamageInVarianceRange(damage, 194f);
         }
 
         [Test]

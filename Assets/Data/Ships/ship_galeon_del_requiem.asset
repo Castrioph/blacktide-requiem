@@ -49,3 +49,8 @@ MonoBehaviour:
     IsGuestSlot: 0
   BaseAbilities: []
   Acquisition: 0
+  Tier: 2
+  AIProfile: 0
+  BossPhases:
+  - HPThreshold: 0.5
+    Profile: 2

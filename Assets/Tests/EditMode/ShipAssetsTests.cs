@@ -68,6 +68,25 @@ namespace BlacktideRequiem.Tests.EditMode
         }
 
         [Test]
+        public void test_ship_assets_enemy_tiers_and_ai_profiles_authored()
+        {
+            // Arrange / Act — S4-05: enemy ships carry tier + AI profile data
+            var normal = Load("ship_balandra_corsaria");
+            var elite = Load("ship_bergantin_maldito");
+            var boss = Load("ship_galeon_del_requiem");
+            var creature = Load("creature_serpiente_abisal");
+
+            // Assert
+            Assert.AreEqual(EnemyTier.Normal, normal.Tier);
+            Assert.AreEqual(BlacktideRequiem.Core.AI.AIProfileType.Agresivo, normal.AIProfile);
+            Assert.AreEqual(EnemyTier.Elite, elite.Tier);
+            Assert.AreEqual(BlacktideRequiem.Core.AI.AIProfileType.Estratega, elite.AIProfile);
+            Assert.AreEqual(EnemyTier.Jefe, boss.Tier);
+            Assert.Greater(boss.BossPhases.Count, 0, "boss must have at least one extra phase");
+            Assert.AreEqual(EnemyTier.Normal, creature.Tier);
+        }
+
+        [Test]
         public void test_ship_assets_all_construct_as_ship_combatants()
         {
             // Arrange
