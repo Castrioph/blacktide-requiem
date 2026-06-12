@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using BlacktideRequiem.Core.Data;
+using BlacktideRequiem.Core.Economy;
+using BlacktideRequiem.Core.Stage;
 using BlacktideRequiem.Runtime.Combat;
 using BlacktideRequiem.UI.Combat.Naval;
 
@@ -23,6 +25,7 @@ public static class BuildNavalCombatScene
     public static string Execute()
     {
         ImportNavalSprites();
+        CreateNavalStageAssets();
 
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -72,46 +75,20 @@ public static class BuildNavalCombatScene
 
         so.FindProperty("_runner").objectReferenceValue = runner;
         so.FindProperty("_hud").objectReferenceValue = hud;
-        so.FindProperty("_allyShip").objectReferenceValue =
-            Load<ShipData>("Assets/Data/Ships/ship_marea_espectral.asset");
+        so.FindProperty("_demoStage").objectReferenceValue =
+            Load<NavalStageData>(NavalStagePath);
+        so.FindProperty("_wallet").objectReferenceValue =
+            Load<CurrencyWallet>(WalletPath);
 
-        // Allied crew: demo protagonists
-        SetList(so, "_allyCrew", new[]
+        // Fallback crew (escena abierta sin flujo): protagonistas demo
+        SetList(so, "_demoCrew", new[]
         {
             "Assets/Data/Characters/elena_tempestad.asset",
             "Assets/Data/Characters/kael_polvora.asset",
             "Assets/Data/Characters/mirra_mareamadre.asset"
         });
 
-        // Enemy crew pool: generic pirate units
-        SetList(so, "_enemyCrewPool", new[]
-        {
-            "Assets/Data/Characters/pirate_grunt_1.asset",
-            "Assets/Data/Characters/pirate_brute_1.asset",
-            "Assets/Data/Characters/corsair_1.asset",
-            "Assets/Data/Characters/hexer_1.asset"
-        });
-
-        // Waves: 1) balandra — 2) bergantín + serpiente — 3) galeón (jefe)
-        var waves = so.FindProperty("_waves");
-        waves.arraySize = 3;
-        SetWave(waves.GetArrayElementAtIndex(0),
-            "Assets/Data/Ships/ship_balandra_corsaria.asset");
-        SetWave(waves.GetArrayElementAtIndex(1),
-            "Assets/Data/Ships/ship_bergantin_maldito.asset",
-            "Assets/Data/Ships/creature_serpiente_abisal.asset");
-        SetWave(waves.GetArrayElementAtIndex(2),
-            "Assets/Data/Ships/ship_galeon_del_requiem.asset");
-
         so.ApplyModifiedPropertiesWithoutUndo();
-    }
-
-    private static void SetWave(SerializedProperty waveEntry, params string[] shipPaths)
-    {
-        var ships = waveEntry.FindPropertyRelative("Ships");
-        ships.arraySize = shipPaths.Length;
-        for (int i = 0; i < shipPaths.Length; i++)
-            ships.GetArrayElementAtIndex(i).objectReferenceValue = Load<ShipData>(shipPaths[i]);
     }
 
     private static void SetList(SerializedObject so, string property, string[] paths)
@@ -120,6 +97,83 @@ public static class BuildNavalCombatScene
         prop.arraySize = paths.Length;
         for (int i = 0; i < paths.Length; i++)
             prop.GetArrayElementAtIndex(i).objectReferenceValue = Load<CharacterData>(paths[i]);
+    }
+
+    // ====================================================================
+    // ASSETS S4-07: stage naval + reward + wallet + registro
+    // ====================================================================
+
+    private const string NavalStagePath = "Assets/Data/Stages/stage_004_mar_de_los_lamentos.asset";
+    private const string RewardPath = "Assets/Data/Rewards/reward_stage_004.asset";
+    private const string WalletPath = "Assets/Data/Economy/player_wallet.asset";
+    private const string RegistryPath = "Assets/Data/Stages/StageRegistry.asset";
+
+    public static void CreateNavalStageAssets()
+    {
+        // Wallet compartida (runtime; sin save hasta S5)
+        if (AssetDatabase.LoadAssetAtPath<CurrencyWallet>(WalletPath) == null)
+        {
+            if (!AssetDatabase.IsValidFolder("Assets/Data/Economy"))
+                AssetDatabase.CreateFolder("Assets/Data", "Economy");
+            AssetDatabase.CreateAsset(
+                ScriptableObject.CreateInstance<CurrencyWallet>(), WalletPath);
+        }
+
+        // RewardTable del stage naval
+        var reward = AssetDatabase.LoadAssetAtPath<RewardTable>(RewardPath);
+        if (reward == null)
+        {
+            reward = ScriptableObject.CreateInstance<RewardTable>();
+            reward.Entries = new List<RewardEntry>
+            {
+                new RewardEntry { Currency = CurrencyType.Doblones, Amount = 150 },
+                new RewardEntry { Currency = CurrencyType.GemasDeCalavera, Amount = 5 }
+            };
+            AssetDatabase.CreateAsset(reward, RewardPath);
+        }
+
+        // Stage naval
+        var stage = AssetDatabase.LoadAssetAtPath<NavalStageData>(NavalStagePath);
+        if (stage == null)
+        {
+            stage = ScriptableObject.CreateInstance<NavalStageData>();
+            stage.Id = "stage_004_mar_de_los_lamentos";
+            stage.DisplayName = "Mar de los Lamentos";
+            stage.Description = "Aguas malditas donde el Requiem patrulla. " +
+                "Combate naval: tu barco contra tres oleadas corsarias.";
+            stage.DifficultyLevel = 3;
+            stage.Rewards = reward;
+            stage.PlayerShip = Load<ShipData>("Assets/Data/Ships/ship_marea_espectral.asset");
+            stage.NavalWaves = new List<NavalWaveDefinition>
+            {
+                new NavalWaveDefinition { Ships = new List<ShipData>
+                    { Load<ShipData>("Assets/Data/Ships/ship_balandra_corsaria.asset") } },
+                new NavalWaveDefinition { Ships = new List<ShipData>
+                    { Load<ShipData>("Assets/Data/Ships/ship_bergantin_maldito.asset"),
+                      Load<ShipData>("Assets/Data/Ships/creature_serpiente_abisal.asset") } },
+                new NavalWaveDefinition { Ships = new List<ShipData>
+                    { Load<ShipData>("Assets/Data/Ships/ship_galeon_del_requiem.asset") } }
+            };
+            stage.EnemyCrewPool = new List<CharacterData>
+            {
+                Load<CharacterData>("Assets/Data/Characters/pirate_grunt_1.asset"),
+                Load<CharacterData>("Assets/Data/Characters/pirate_brute_1.asset"),
+                Load<CharacterData>("Assets/Data/Characters/corsair_1.asset"),
+                Load<CharacterData>("Assets/Data/Characters/hexer_1.asset")
+            };
+            AssetDatabase.CreateAsset(stage, NavalStagePath);
+        }
+
+        // Registro en StageRegistry (visible en StageSelect)
+        var registry = AssetDatabase.LoadAssetAtPath<StageRegistry>(RegistryPath);
+        if (registry != null && !registry.Stages.Contains(stage))
+        {
+            registry.Stages.Add(stage);
+            EditorUtility.SetDirty(registry);
+        }
+
+        AssetDatabase.SaveAssets();
+        Debug.Log("[S4-07] Assets navales creados/verificados (stage_004 + reward + wallet)");
     }
 
     private static T Load<T>(string path) where T : Object

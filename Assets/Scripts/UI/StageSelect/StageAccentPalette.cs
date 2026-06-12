@@ -32,6 +32,10 @@ namespace BlacktideRequiem.UI.StageSelect
         private static readonly StageAccent Templo = new StageAccent(
             new Color(0.749f, 0.212f, 0.047f), new Color(1f, 0.541f, 0.396f));
 
+        // Abyssal Teal / Sea Glass — stage naval (S4-07)
+        private static readonly StageAccent Lamentos = new StageAccent(
+            new Color(0.051f, 0.451f, 0.467f), new Color(0.420f, 0.800f, 0.773f));
+
         // Gold fallback for stages without a defined identity
         private static readonly StageAccent Fallback = new StageAccent(
             new Color(0.831f, 0.627f, 0.090f), new Color(0.949f, 0.780f, 0.251f));
@@ -42,6 +46,7 @@ namespace BlacktideRequiem.UI.StageSelect
             if (stageId.StartsWith("stage_001")) return Bahia;
             if (stageId.StartsWith("stage_002")) return Muelle;
             if (stageId.StartsWith("stage_003")) return Templo;
+            if (stageId.StartsWith("stage_004")) return Lamentos;
             return Fallback;
         }
     }

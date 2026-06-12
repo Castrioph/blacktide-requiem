@@ -109,6 +109,12 @@ Color BorderSelected   = new Color(0.831f, 0.627f, 0.090f);
 
 ## 5. Checklist UI — Antes de Marcar Done
 
+- [ ] **Game view en portrait 1080×1920** antes de playtest (Free Aspect apaisado
+      deforma la UI en barras gigantes). Fix: `SetPortraitGameView.Execute`
+      (Assets/Editor/) o elegir "Blacktide 1080x1920" en el dropdown de aspecto.
+- [ ] EventSystem usa `InputSystemUIInputModule` (proyecto es Input System-only;
+      `StandaloneInputModule` lanza excepción por frame y mata el input real.
+      Fix masivo: `FixEventSystemModules.Execute`)
 - [ ] Anchors en rango [0..1] en todos los RectTransforms
 - [ ] Scroll: VLG `childControlWidth/Height=true`, `ContentSizeFitter`, pivot `(0.5,1)`, Viewport alpha 0.004
 - [ ] Prefabs en scroll: tienen `LayoutElement.preferredHeight`

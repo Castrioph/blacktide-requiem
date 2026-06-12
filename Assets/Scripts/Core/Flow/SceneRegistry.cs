@@ -10,6 +10,7 @@ namespace BlacktideRequiem.Core.Flow
         public const string StageSelect = "StageSelect";
         public const string TeamSelect = "TeamSelect";
         public const string Combat = "CombatDemo";
+        public const string NavalCombat = "NavalCombat";
         public const string Results = "Results";
     }
 }

@@ -90,12 +90,17 @@ namespace BlacktideRequiem.Runtime.Flow
         }
 
         /// <summary>
-        /// Transition to Combat scene. Set SelectedStage before calling.
+        /// Transition to the combat scene. Set SelectedStage before calling.
+        /// Naval stages load the naval combat scene (ADR-004: resolvers
+        /// paralelos, escenas paralelas).
         /// </summary>
         public void LoadCombat()
         {
             LastBattleResult = null;
-            TransitionTo(GameFlowState.Combat, SceneRegistry.Combat);
+            string scene = SelectedStage is NavalStageData
+                ? SceneRegistry.NavalCombat
+                : SceneRegistry.Combat;
+            TransitionTo(GameFlowState.Combat, scene);
         }
 
         /// <summary>
