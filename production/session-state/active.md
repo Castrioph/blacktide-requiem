@@ -3,14 +3,14 @@
 <!-- STATUS -->
 Epic: Combate Naval
 Feature: Sprint 4 — Naval-first (production/sprints/sprint-004.md)
-Task: S4-05 ✅ implementado (335/335 tests), pendiente commit. Siguiente: S4-06 Naval Combat UI (team-ui, spec-first).
+Task: S4-05 ✅ commiteado y pushed (84af6f5, 335/335 tests). Siguiente: S4-06 Naval Combat UI (team-ui, spec-first) o S4-07 stage naval.
 <!-- /STATUS -->
 
 - Updated: 2026-06-12
 - Sprint/Task: sprint-004 / S4-05 enemigos navales AI ✅ (AC 25-27; AC 28 ya en S4-04)
 - Verification Path: editor-tools (Coplay check_compile ✅ + TestRunnerApi ✅ 335/335)
 
-## S4-05 (implementado, sin commit)
+## S4-05 (commiteado + pushed)
 
 - NavalEnemyAI NUEVO (Core/AI): ICombatInput naval. Perfiles: Agresivo (menor
   HHP; abordaje solo con kill garantizado — estima min damage determinista),
@@ -38,4 +38,4 @@ Task: S4-05 ✅ implementado (335/335 tests), pendiente commit. Siguiente: S4-06
 
 ## Pendiente
 
-- Commit S4-05 (usuario debe aprobar).
+- Ninguno. Should Have restantes: S4-06 (UI naval) y S4-07 (stage + flujo).
