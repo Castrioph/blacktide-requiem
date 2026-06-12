@@ -1,7 +1,9 @@
 {
     "name": "BlacktideRequiem",
     "rootNamespace": "BlacktideRequiem",
-    "references": [],
+    "references": [
+        "Unity.InputSystem"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using BlacktideRequiem.Core.AI;
@@ -25,21 +26,26 @@ namespace BlacktideRequiem.Runtime.Combat
         private CombatManager _manager;
         private ICombatInput _playerInput;
         private EnemyAI _defaultEnemyAI;
+        private Func<ICombatant, ICombatInput> _enemyInputSelector;
 
         /// <summary>The CombatManager being driven. Set after StartBattle.</summary>
         public CombatManager Manager => _manager;
 
         /// <summary>
         /// Initializes and starts a battle with the given config and player input source.
+        /// Naval battles pass a NavalTurnResolver and a per-enemy input selector
+        /// (each naval enemy owns its NavalEnemyAI — bosses carry phase state).
         /// </summary>
         public void StartBattle(BattleConfig config, ICombatInput playerInput,
-            EnemyAI enemyAI = null)
+            EnemyAI enemyAI = null, ITurnResolver resolver = null,
+            Func<ICombatant, ICombatInput> enemyInputSelector = null)
         {
             _playerInput = playerInput;
             _defaultEnemyAI = enemyAI ?? new EnemyAI(AIProfileType.Agresivo);
+            _enemyInputSelector = enemyInputSelector;
 
             var bar = new InitiativeBar();
-            _manager = new CombatManager(bar);
+            _manager = new CombatManager(bar, resolver);
             _manager.StartBattle(config);
 
             StartCoroutine(BattleLoop());
@@ -76,7 +82,9 @@ namespace BlacktideRequiem.Runtime.Combat
                     }
                     else
                     {
-                        _defaultEnemyAI.RequestAction(context, action => chosenAction = action);
+                        var enemyInput = _enemyInputSelector?.Invoke(entry.Combatant)
+                            ?? (ICombatInput)_defaultEnemyAI;
+                        enemyInput.RequestAction(context, action => chosenAction = action);
                         yield return new WaitForSeconds(_enemyActionDelay);
                     }
 

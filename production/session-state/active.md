@@ -3,39 +3,38 @@
 <!-- STATUS -->
 Epic: Combate Naval
 Feature: Sprint 4 — Naval-first (production/sprints/sprint-004.md)
-Task: S4-05 ✅ commiteado y pushed (84af6f5, 335/335 tests). Siguiente: S4-06 Naval Combat UI (team-ui, spec-first) o S4-07 stage naval.
+Task: S4-06 Naval Combat UI — implementado + verificado con capture; PENDIENTE playtest usuario (DoD) y commit.
 <!-- /STATUS -->
 
 - Updated: 2026-06-12
-- Sprint/Task: sprint-004 / S4-05 enemigos navales AI ✅ (AC 25-27; AC 28 ya en S4-04)
-- Verification Path: editor-tools (Coplay check_compile ✅ + TestRunnerApi ✅ 335/335)
+- Sprint/Task: sprint-004 / S4-06 (specs + HUD + assets) — 335/335 tests
+- Verification Path: editor-tools (check_compile ✅, capture_ui_canvas ✅ x4, smoke test clicks vía SimNavalActions)
 
-## S4-05 (commiteado + pushed)
+## S4-06 estado
 
-- NavalEnemyAI NUEVO (Core/AI): ICombatInput naval. Perfiles: Agresivo (menor
-  HHP; abordaje solo con kill garantizado — estima min damage determinista),
-  Estratega NUEVO enum (mayor amenaza FPW/MST; habilidad con ventaja elemental;
-  abordaje táctico al Capitán), Defensivo (buff→ataque, sin Guard), Caótico
-  (RNG inyectable). Elite Profile+: heal self bajo 30% HHP. Jefe: fases por
-  HP% (NavalBossPhase, one-directional) + LB vía SeaAbility entries.
-- Reglas globales: enemigos nunca Maniobra/Reparar/Guard; abordaje requiere
-  crew viva en AMBOS lados (criaturas nunca abordan ni son abordadas).
-- ShipData += Tier/AIProfile/BossPhases; EnemyTier NUEVO enum.
-- Assets cableados: balandra Normal/Agresivo, bergantín Elite/Estratega,
-  galeón Jefe (fase 2 Estratega <50%), serpiente Normal criatura.
-- Tests: NavalEnemyAITests.cs (17) + ShipAssetsTests +1.
-- FIX tests S4-04: 3 asserts asumían HDF enemigo 80; real 83 (+3 Artillero
-  crew contribution) → bases 100→97, 200→194. Eran flaky por orden RNG.
+- Specs aprobados: docs/art/ui-s406-naval-ux-spec.md + ui-s406-naval-visual-design.md.
+  Decisiones usuario: D1 chips overlay en sprite, D2 LB barra binaria, D3 inspección incluida.
+- Código: Assets/Scripts/UI/Combat/Naval/ (NavalCombatHUD, CrewChipOverlay,
+  NavalShipView, NavalUIFactory, NavalUIColors, NavalPlayerCombatInput) +
+  Runtime/Combat/NavalCombatBootstrap. CombatRunner += resolver/enemyInputSelector.
+- asmdef BlacktideRequiem += Unity.InputSystem (proyecto es Input System-only;
+  EventSystem necesita InputSystemUIInputModule, NO StandaloneInputModule).
+- 20 iconos IA en Assets/Resources/Sprites/UI/Naval/ (Coplay gemini, ~$2.7).
+- Escena: Assets/Scenes/NavalCombat.unity (BuildNavalCombatScene.Execute la regenera).
+  Batalla auto-start: marea_espectral (crew elena/kael/mirra) vs 3 oleadas
+  (balandra / bergantín+serpiente / galeón jefe).
+- Smoke test OK: cañonazo+targeting, abordaje con chips (zoom+focus+confirm),
+  AI enemiga, log español, IB, oleada 1/3.
 
-## Notas para S4-06/07
+## Pendiente S4-06 (antes de Done)
 
-- CombatRunner usa _defaultEnemyAI compartido (land); naval necesita 1
-  NavalEnemyAI POR enemigo (boss tiene estado de fase) — wiring en S4-07
-  vía NavalEnemyAI.FromShipData(shipData).
-- Crew enemiga: quien arma batalla asigna units a RoleSlots (S4-07 decide
-  fuente: preset en StageData naval o crew default por barco).
-- Sinergias crew: ship.EvaluateCrewSynergies() lo llama quien arma la batalla.
+- Playtest manual usuario: open NavalCombat.unity → Play. Probar: Maniobra,
+  Reparar, Escape/click-dcho cancelar, hover inspección crew, oleadas 2-3,
+  jefe, victoria/derrota. Helpers: Assets/Editor/SimNavalActions.cs.
+- Commit tras playtest (pedir al usuario). Luego S4-07 stage naval + flujo.
 
-## Pendiente
+## Notas para S4-07
 
-- Ninguno. Should Have restantes: S4-06 (UI naval) y S4-07 (stage + flujo).
+- NavalCombatBootstrap es temporal: S4-07 lo sustituye por StageData naval
+  en el flujo MainMenu→StageSelect→Combat→Results.
+- Agente ui-programmer murió a mitad (patrón conocido); resto se hizo inline.
