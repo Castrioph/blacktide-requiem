@@ -274,8 +274,11 @@ namespace BlacktideRequiem.Tests.EditMode
             var roster = new List<CharacterData>(characters.Values);
 
             var teamComp = new TeamComposition(roster);
-            teamComp.SelectCharacter(0, _elena);
-            teamComp.SelectCharacter(1, _kael);
+            // Select instances from THIS roster — TeamComposition.RosterContains
+            // compares by reference, so SetUp's _elena/_kael (built by a separate
+            // BuildCharacters call) would be rejected and the team would be empty.
+            teamComp.SelectCharacter(0, characters[DemoRosterFactory.ElenaId]);
+            teamComp.SelectCharacter(1, characters[DemoRosterFactory.KaelId]);
 
             var stage = ScriptableObject.CreateInstance<StageData>();
             stage.Id = "test_stage";
