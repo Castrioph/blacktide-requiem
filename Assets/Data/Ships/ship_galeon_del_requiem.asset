@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3b5577f5bf00dc47b4db017e55e592c, type: 3}
+  m_Name: ship_galeon_del_requiem
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.ShipData
+  ShipId: ship_galeon_del_requiem
+  DisplayName: "Gale\xF3n del R\xE9quiem"
+  Description: "Fortaleza flotante envuelta en c\xE1nticos f\xFAnebres. Donde fondea,
+    el mar guarda silencio."
+  BaseStats:
+    HHP: 1200
+    FPW: 160
+    HDF: 120
+    MST: 110
+    MP: 80
+    RSL: 100
+    SPD: 60
+  Element: 7
+  RoleSlots:
+  - SlotIndex: 0
+    Role: 0
+    IsGuestSlot: 0
+  - SlotIndex: 1
+    Role: 2
+    IsGuestSlot: 0
+  - SlotIndex: 2
+    Role: 2
+    IsGuestSlot: 0
+  - SlotIndex: 3
+    Role: 2
+    IsGuestSlot: 0
+  - SlotIndex: 4
+    Role: 1
+    IsGuestSlot: 0
+  - SlotIndex: 5
+    Role: 4
+    IsGuestSlot: 0
+  - SlotIndex: 6
+    Role: 6
+    IsGuestSlot: 0
+  BaseAbilities: []
+  Acquisition: 0

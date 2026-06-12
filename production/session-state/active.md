@@ -3,28 +3,31 @@
 <!-- STATUS -->
 Epic: Combate Naval
 Feature: Sprint 4 — Naval-first (production/sprints/sprint-004.md)
-Task: S4-01 ✅ + S4-02a refactor ✅ (255/255 tests). Siguiente: S4-02b ShipCombatant + CrewMemberState + assets.
+Task: S4-02 COMPLETO (a: refactor ✅ commiteado; b: ShipCombatant+assets ✅ pendiente commit). Siguiente: S4-03 stats engine + recálculo.
 <!-- /STATUS -->
 
 - Updated: 2026-06-12
-- Sprint/Task: sprint-004 / S4-02a extracción ICombatant ✅
-- Verification Path: editor-tools (Coplay check_compile + TestRunnerApi) ✅ 255/255
+- Sprint/Task: sprint-004 / S4-02 Ship Data Model ✅
+- Verification Path: editor-tools (Coplay check_compile + TestRunnerApi) ✅ 275/275
 
-## S4-01 entregado
+## S4-02a (commiteado)
 
-- ADR-004 Accepted (commit f...): reuso por composición — ICombatant,
-  crew pasiva, ITurnResolver (Land/Naval), CombatAction extendida, ITraitCarrier
+- ICombatant (+superficie HP→HHP), ITraitCarrier, ITurnResolver, LandTurnResolver
+- InitiativeEntry: ICombatant + helper .Unit; SynergyEvaluator → ITraitCarrier
+- CombatManager: resolver inyectable; casts interinos hasta S4-04
+- Fix test preexistente TeamComposition (instancias roster) → 255/255
+- Runner: Assets/Editor/RunEditModeTests.cs → test-results-s402a.txt (gitignored)
 
-## S4-02a entregado (pendiente commit)
+## S4-02b (pendiente commit)
 
-- Nuevos: ICombatant.cs, ITraitCarrier.cs, ITurnResolver.cs, LandTurnResolver.cs
-- ICombatant incluye superficie HP (CurrentHP/MaxHP/ApplyDamage/Healing → barco=HHP; ADR actualizado)
-- InitiativeEntry.Combatant: ICombatant + helper .Unit (CombatantState|null)
-- CombatManager: resolver inyectable (default Land), casts interinos a CombatantState
-  en listas/eventos — S4-04 los generaliza
-- Tests: gate verificado con stash-baseline (fallo TeamComposition era PREEXISTENTE,
-  bug del test: instancias de roster distinto; arreglado → 255/255)
-- Runner permanente: Assets/Editor/RunEditModeTests.cs (TestRunnerApi → test-results-s402a.txt)
+- ShipCombatant (ICombatant: hull, MP, statuses+inmunidades, cooldowns, pool,
+  cache aditivo base+upgrade+crew × buff modifier) + CrewMemberState (HP fijo
+  por rol, ITraitCarrier → buffs al BuffStack del barco)
+- 5 assets: Assets/Data/Ships/ (Marea Espectral aliado, Balandra/Bergantín/
+  Galeón enemigos N/E/J, Serpiente Abisal criatura sin crew)
+- 20 tests nuevos (ShipCombatantTests 16 + ShipAssetsTests 4) → 275/275
+- Nota: "visible en juego" del acceptance se completa en S4-07 (stage naval)
+- Crew contribution usa BaseStats nivel 1 (consistente con StageController)
 
 ## Contexto S3 (cerrado 2026-06-12)
 

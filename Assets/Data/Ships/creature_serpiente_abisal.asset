@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3b5577f5bf00dc47b4db017e55e592c, type: 3}
+  m_Name: creature_serpiente_abisal
+  m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Data.ShipData
+  ShipId: creature_serpiente_abisal
+  DisplayName: Serpiente Abisal
+  Description: "V\xE9rtebra viva de los abismos. No tiene tripulaci\xF3n que abordar
+    \u2014 solo hambre."
+  BaseStats:
+    HHP: 600
+    FPW: 110
+    HDF: 70
+    MST: 90
+    MP: 60
+    RSL: 90
+    SPD: 95
+  Element: 4
+  RoleSlots: []
+  BaseAbilities: []
+  Acquisition: 0
