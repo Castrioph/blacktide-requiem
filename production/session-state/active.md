@@ -3,35 +3,36 @@
 <!-- STATUS -->
 Epic: Content Loop (land side)
 Feature: Sprint 3 — Content Loop
-Task: S3-06 + S3-07 DONE. Flujo completo playtested vía Coplay. Pendiente: playtest manual por usuario.
+Task: S3-11 implementado + verificado Coplay. Pendiente: playtest manual usuario + commit.
 <!-- /STATUS -->
 
-- Updated: 2026-04-21
-- Sprint/Task: sprint-003 / S3-06 + S3-07 Done (playtest Coplay ✅)
-- Verification Path: usuario debe confirmar en Play mode manual
+- Updated: 2026-06-12
+- Sprint/Task: sprint-003 / S3-11 UI Review & Polish (P0+P1+P2 completo)
+- Verification Path: Coplay Play mode + capturas ✅ — falta playtest manual usuario (retro #4)
 
-## Sprint 3 Direction (user-picked: A)
+## S3-11 entregado
 
-- Must: ALL DONE (S3-01..05)
-- Should: S3-06 ✅ Done, S3-07 ✅ Done — playtest Coplay completo
-- Should: S3-08 Coplay-down fallback doc — pendiente
-- New: S3-11 UI Review & Polish (después de playtest manual usuario)
+- Docs: ui-s311-ux-audit.md + ui-s311-visual-design.md (paleta canónica #140F24)
+- Escenas movidas a Assets/Scenes/ (stubs borrados), Build Settings reescrito
+- CanvasScaler 1080×1920, firstSelected, scroll horizontal off, ghost text fuera
+- Headers 180px, botones 540×88+, ColorBlocks oro, disabled WCAG #A08040
+- Fuentes Pirata One + Noto Sans (TTF legacy Text — TMP diferido)
+- Prefabs: stripes acento, reward strip, estados slot/roster lleno=oro
+- BtnClear ELIMINADO (decisión usuario): 2º tap en roster deselecciona
+- Aplicador idempotente: Assets/Editor/ApplyS311UIPolish.cs (corrido 2×, OK)
 
-## Flujo verificado (Coplay)
+## Flujo verificado (Coplay, post-polish)
 
 MainMenu → StageSelect → TeamSelect → Combat → Results → MainMenu ✅
 
-## Escenas y visual
+## Fase 4-5 (team-ui) completadas
 
-| Escena | Estado |
-|--------|--------|
-| MainMenu | ✅ "BLACKTIDE REQUIEM" + "Start Battle" — gold/dark palette |
-| StageSelect | ✅ 3 misiones con nombre, estrellas dificultad, botón → |
-| TeamSelect | ✅ 3 slots vacíos, roster Elena/Kael/Mirra visible |
-| CombatDemo | ✅ carga, Round 1 / Wave 1/1 |
-| Results | ✅ carga, BtnReturnToMenu funciona |
+- Review UX: P0 8/8 ✅, P1 8/9 (P1-08 cerrado por review Art). Review Art: CONSISTENT ×5 secciones
+- Fase 5: BtnBack ColorBlock cream/gold fixed (targetGraphic=label) + paleta canónica en lessons §4
+- RewardTables creadas (Assets/Data/Rewards/, 50/80/120 Doblones) y cableadas a stages — cards muestran botín real
+- Gap aceptado: D-pad explícito por listas (P2-10) — focus inicial por código
 
-## Next Step
+## Pendiente
 
-Usuario debe hacer playtest manual (Play desde MainMenu, click real en botones).
-Después: S3-08 doc + S3-11 UI Polish con `team-ui` skill.
+- Playtest manual usuario (DoD retro #4) antes de marcar S3-11 Done
+- Commit (pedir permiso usuario, Conventional Commits)

@@ -50,8 +50,8 @@ _(empty)_
 |----|------|-------|------|-------------|---------------------|
 | ~~S3-06~~ | ~~Stage Select UI~~ | ui-programmer | M | S3-02 | ✅ Done — layout, colores, 3 misiones visibles, navegación verificada Coplay |
 | ~~S3-07~~ | ~~Team Select UI~~ | ui-programmer | M | S3-05, S3-06 | ✅ Done — slots, roster Elena/Kael/Mirra, flujo completo verificado Coplay |
-| S3-08 | Document Coplay-down fallback in `CLAUDE.md` (retro action #3) | technical-director | S | — | CLAUDE.md snippet: close editor + batchmode OR request manual playtest when Coplay MCP is down |
-| S3-11 | UI Review & Polish (audit MainMenu + StageSelect + TeamSelect, create visual assets) | team-ui | L | S3-06, S3-07 | All UI screens reviewed with `team-ui` skill; sprites/assets created matching Art Bible; visual direction doc updated; Coplay capture confirms correct look |
+| ~~S3-08~~ | ~~Document Coplay-down fallback in `CLAUDE.md`~~ | technical-director | S | — | ✅ Done — sección "Coplay Fallback" en CLAUDE.md |
+| S3-11 | UI Review & Polish (audit MainMenu + StageSelect + TeamSelect, create visual assets) | team-ui | L | S3-06, S3-07 | ✅ Implementado 2026-06-12 (P0+P1+P2): audit + visual design docs, paleta #140F24, fuentes Pirata One/Noto Sans, escenas reubicadas, RewardTables creadas. Coplay capture ✅ flujo completo. **Pendiente: playtest manual usuario (retro #4) antes de Done** |
 
 ### Backlog — Nice to Have
 

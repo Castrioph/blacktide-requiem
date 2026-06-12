@@ -6,13 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MainMenu.unity
+    path: Assets/Scenes/MainMenu.unity
     guid: f64e8e099a09e484b91b404f32129389
   - enabled: 1
-    path: Assets/StageSelect.unity
+    path: Assets/Scenes/StageSelect.unity
     guid: e5624e02527a03443916b968fe73c52e
   - enabled: 1
-    path: Assets/TeamSelect.unity
+    path: Assets/Scenes/TeamSelect.unity
     guid: ee8611741a80b3b4eb8d9ecb3bfd7cb6
   - enabled: 1
     path: Assets/Scenes/CombatDemo.unity

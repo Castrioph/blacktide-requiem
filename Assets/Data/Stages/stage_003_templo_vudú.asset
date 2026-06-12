@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: BlacktideRequiem::BlacktideRequiem.Core.Stage.StageData
   Id: stage_003_templo_vudu
   DisplayName: "Templo Vud\xFA"
-  Description: "Un templo maldito donde los m\xE1s peligrosos brujos y corsarios aguardan."
+  Description: "Un templo maldito donde los m\xE1s peligrosos brujos y corsarios
+    aguardan."
   DifficultyLevel: 5
   Waves:
   - Enemies:
@@ -29,3 +30,4 @@ MonoBehaviour:
     - Enemy: {fileID: 11400000, guid: a1b2c3d4e5f67890abcdef1234560004, type: 2}
       SlotIndex: 1
     EnemyCaptainIndex: 1
+  Rewards: {fileID: 11400000, guid: 457e22b278218b34a8e9fefdace48b23, type: 2}

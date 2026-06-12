@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using BlacktideRequiem.Core.Stage;
 using BlacktideRequiem.Runtime.Flow;
@@ -15,10 +16,10 @@ namespace BlacktideRequiem.UI.StageSelect
         [SerializeField] private Button _btnLaunch;
         [SerializeField] private Text _emptyStateText;
 
-        private static readonly Color LaunchColorEnabled  = new Color(0.831f, 0.627f, 0.090f);
-        private static readonly Color LaunchColorDisabled = new Color(0.239f, 0.188f, 0.125f);
-        private static readonly Color LaunchTextEnabled   = new Color(0.102f, 0.051f, 0f);
-        private static readonly Color LaunchTextDisabled  = new Color(0.420f, 0.353f, 0.188f);
+        // Button background states are driven by the Button ColorBlock (scene-serialized).
+        // The controller only adjusts the label for WCAG-compliant disabled contrast.
+        private static readonly Color LaunchTextEnabled  = new Color(0.102f, 0.051f, 0f);            // #1A0D00
+        private static readonly Color LaunchTextDisabled = new Color(0.627f, 0.502f, 0.251f, 0.7f);  // #A08040 a180
 
         private readonly List<StageEntryUI> _entries = new List<StageEntryUI>();
         private StageEntryUI _selectedEntry;
@@ -34,6 +35,7 @@ namespace BlacktideRequiem.UI.StageSelect
 
             SetLaunchInteractable(false);
             PopulateStageList();
+            FocusFirstEntry();
         }
 
         private void OnDestroy()
@@ -69,8 +71,17 @@ namespace BlacktideRequiem.UI.StageSelect
                 if (stage == null) continue;
                 StageEntryUI entry = Instantiate(_entryPrefab, _entryContainer);
                 entry.Initialize(stage, OnStageSelected);
+                entry.SetAccent(StageAccentPalette.Get(stage.Id));
                 _entries.Add(entry);
             }
+        }
+
+        // P0-02: runtime-spawned entries cannot be serialized as firstSelected,
+        // so give gamepad/keyboard focus to the first stage card here.
+        private void FocusFirstEntry()
+        {
+            if (_entries.Count > 0 && EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(_entries[0].SelectableObject);
         }
 
         private void OnStageSelected(StageData stage)
@@ -118,7 +129,6 @@ namespace BlacktideRequiem.UI.StageSelect
         {
             if (_btnLaunch == null) return;
             _btnLaunch.interactable = interactable;
-            _btnLaunch.image.color = interactable ? LaunchColorEnabled : LaunchColorDisabled;
 
             Text label = _btnLaunch.GetComponentInChildren<Text>();
             if (label != null)

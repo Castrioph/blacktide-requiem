@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using BlacktideRequiem.Core.Data;
 using BlacktideRequiem.Core.Team;
@@ -12,8 +13,9 @@ namespace BlacktideRequiem.UI.TeamSelect
         [SerializeField] private CharacterData[] _roster;
 
         [Header("Slots (3 exactly)")]
-        [SerializeField] private Text[]   _slotNameTexts;
-        [SerializeField] private Button[] _slotClearButtons;
+        [SerializeField] private Text[]  _slotNameTexts;
+        [SerializeField] private Image[] _slotBackgrounds;
+        [SerializeField] private Image[] _slotBorders;
 
         [Header("Roster list")]
         [SerializeField] private Transform         _rosterContainer;
@@ -23,10 +25,18 @@ namespace BlacktideRequiem.UI.TeamSelect
         [SerializeField] private Button _btnBack;
         [SerializeField] private Button _btnConfirm;
 
-        private static readonly Color ConfirmColorEnabled  = new Color(0.831f, 0.627f, 0.090f);
-        private static readonly Color ConfirmColorDisabled = new Color(0.239f, 0.188f, 0.125f);
-        private static readonly Color ConfirmTextEnabled   = new Color(0.102f, 0.051f, 0f);
-        private static readonly Color ConfirmTextDisabled  = new Color(0.420f, 0.353f, 0.188f);
+        // Button background states are driven by the Button ColorBlock (scene-serialized).
+        // The controller only adjusts the label for WCAG-compliant disabled contrast.
+        private static readonly Color ConfirmTextEnabled  = new Color(0.102f, 0.051f, 0f);            // #1A0D00
+        private static readonly Color ConfirmTextDisabled = new Color(0.627f, 0.502f, 0.251f, 0.7f);  // #A08040 a180
+
+        // Slot visual states — docs/art/ui-s311-visual-design.md §4.4
+        private static readonly Color SlotBgEmpty      = new Color(0.122f, 0.090f, 0.180f);  // #1F172E
+        private static readonly Color SlotBgFilled     = new Color(0.165f, 0.118f, 0.063f);  // #2A1E10
+        private static readonly Color SlotBorderEmpty  = new Color(0.227f, 0.165f, 0.310f);  // #3A2A50
+        private static readonly Color SlotBorderFilled = new Color(0.831f, 0.627f, 0.090f);  // #D4A017
+        private static readonly Color SlotNameEmpty    = new Color(0.929f, 0.851f, 0.639f, 0.55f); // cream a140
+        private static readonly Color SlotNameFilled   = new Color(0.961f, 0.902f, 0.784f);  // #F5E6C8
 
         private static readonly string EmptySlotLabel = "— Vacío —";
 
@@ -46,25 +56,16 @@ namespace BlacktideRequiem.UI.TeamSelect
             _btnBack?.onClick.AddListener(OnBackClicked);
             _btnConfirm?.onClick.AddListener(OnConfirmClicked);
 
-            for (int i = 0; i < TeamComposition.MaxSlots; i++)
-            {
-                int captured = i;
-                _slotClearButtons?[captured]?.onClick.AddListener(() => OnSlotClearClicked(captured));
-            }
-
             BuildRosterList();
             RefreshSlotDisplays();
             SetConfirmInteractable(false);
+            FocusFirstEntry();
         }
 
         private void OnDestroy()
         {
             if (_btnBack != null)    _btnBack.onClick.RemoveListener(OnBackClicked);
             if (_btnConfirm != null) _btnConfirm.onClick.RemoveListener(OnConfirmClicked);
-
-            if (_slotClearButtons != null)
-                for (int i = 0; i < _slotClearButtons.Length; i++)
-                    _slotClearButtons[i]?.onClick.RemoveAllListeners();
         }
 
         private void BuildRosterList()
@@ -84,9 +85,18 @@ namespace BlacktideRequiem.UI.TeamSelect
             }
         }
 
+        // P0-02: runtime-spawned entries cannot be serialized as firstSelected,
+        // so give gamepad/keyboard focus to the first roster card here.
+        private void FocusFirstEntry()
+        {
+            if (_entries.Count > 0 && EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(_entries[0].SelectableObject);
+        }
+
+        // Tap toggles membership: in team → remove, not in team → first empty slot.
+        // BtnClear was removed in S3-11 (user decision) — this is the only clear path.
         private void OnRosterEntryClicked(CharacterData data)
         {
-            // If already in team → remove from its slot
             for (int i = 0; i < TeamComposition.MaxSlots; i++)
             {
                 if (_composition.GetSlot(i) == data)
@@ -97,7 +107,6 @@ namespace BlacktideRequiem.UI.TeamSelect
                 }
             }
 
-            // Find first empty slot and assign
             for (int i = 0; i < TeamComposition.MaxSlots; i++)
             {
                 if (_composition.GetSlot(i) == null)
@@ -109,12 +118,6 @@ namespace BlacktideRequiem.UI.TeamSelect
             }
         }
 
-        private void OnSlotClearClicked(int slotIndex)
-        {
-            _composition.ClearSlot(slotIndex);
-            RefreshAll();
-        }
-
         private void RefreshAll()
         {
             RefreshSlotDisplays();
@@ -124,12 +127,22 @@ namespace BlacktideRequiem.UI.TeamSelect
 
         private void RefreshSlotDisplays()
         {
-            if (_slotNameTexts == null) return;
-            for (int i = 0; i < TeamComposition.MaxSlots && i < _slotNameTexts.Length; i++)
+            for (int i = 0; i < TeamComposition.MaxSlots; i++)
             {
-                if (_slotNameTexts[i] == null) continue;
                 CharacterData inSlot = _composition.GetSlot(i);
-                _slotNameTexts[i].text = inSlot != null ? inSlot.DisplayName : EmptySlotLabel;
+                bool filled = inSlot != null;
+
+                if (_slotNameTexts != null && i < _slotNameTexts.Length && _slotNameTexts[i] != null)
+                {
+                    _slotNameTexts[i].text  = filled ? inSlot.DisplayName : EmptySlotLabel;
+                    _slotNameTexts[i].color = filled ? SlotNameFilled : SlotNameEmpty;
+                }
+
+                if (_slotBackgrounds != null && i < _slotBackgrounds.Length && _slotBackgrounds[i] != null)
+                    _slotBackgrounds[i].color = filled ? SlotBgFilled : SlotBgEmpty;
+
+                if (_slotBorders != null && i < _slotBorders.Length && _slotBorders[i] != null)
+                    _slotBorders[i].color = filled ? SlotBorderFilled : SlotBorderEmpty;
             }
         }
 
@@ -174,7 +187,6 @@ namespace BlacktideRequiem.UI.TeamSelect
         {
             if (_btnConfirm == null) return;
             _btnConfirm.interactable = interactable;
-            _btnConfirm.image.color = interactable ? ConfirmColorEnabled : ConfirmColorDisabled;
 
             Text label = _btnConfirm.GetComponentInChildren<Text>();
             if (label != null)
